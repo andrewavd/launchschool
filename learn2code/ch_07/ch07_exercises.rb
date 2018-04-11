@@ -1,5 +1,4 @@
 # 99 botles of beer on the wall
-=begin
 puts "How many bottles do you wish to start with?"
 bottles = gets.chomp.to_i
 
@@ -31,27 +30,20 @@ while bye_count < 3
 end
 
 puts "Grandma says: GOOD BYE!"
-=end
+
 
 # Leap years
-puts "Please enter a beginning year:"
+print "Please enter a beginning year: "
 start_year = gets.chomp.to_i
-puts "Please enter an ending year:"
+print "Please enter an ending year: "
 end_year = gets.chomp.to_i
-flag = false
+
+puts
+puts "Between #{start_year} and #{end_year} (inclusive), the following are leap years:"
+puts
 
 for x in start_year..end_year
-  if x%4 == 0 && x%100 != 0
-    flag = true
-  elsif x%4 == 0 && x%100 == 0 && x%400 == 0
-    flag = true
-  else
-    flag = false
-  end
-  if flag
+  if (x%4 == 0 && x%100 != 0) || (x%4 == 0 && x%100 == 0 && x%400 == 0)
     puts "#{x} is a leap year."
-  else
-    puts "#{x} is not a leap year."
   end
-  flag = false
 end
