@@ -42,7 +42,8 @@ puts
 puts "Between #{start_year} and #{end_year} (inclusive), the following are leap years:"
 puts
 
-for x in start_year..end_year
+#for x in start_year..end_year
+(start_year..end_year).each do |x|
   if (x%4 == 0 && x%100 != 0) || (x%4 == 0 && x%100 == 0 && x%400 == 0)
     puts "#{x} is a leap year."
   end
