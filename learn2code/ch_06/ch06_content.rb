@@ -1,4 +1,8 @@
+# Learn to Program - Second Edition : Chapter 6, by Chris Pine
 # Following is the content from chapter 6
+# The output is unlikely to make sense unless the code is being followed.
+
+puts "The following output may not make much sense unless you are following along with the code."
 
 puts "The following is a list of methods we have seen/used so far:"
 puts "1. puts"

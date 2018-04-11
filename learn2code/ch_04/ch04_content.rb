@@ -1,4 +1,8 @@
+# Learn to Program - Second Edition : Chapter 4, by Chris Pine
 # The following is content from chapter 4.
+# The output is unlikely to make sense unless the code is being followed.
+
+puts "The following output may not make much sense unless you are following along with the code."
 
 puts '...you can say that again...'
 puts '...you can say that again...'
