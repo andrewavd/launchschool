@@ -49,7 +49,7 @@ puts "Bed wetting is an issue: " + wets_bed.to_s
     end
   end
 
-  puts factorial(3)
-  puts factorial(30)
-  puts factorial(0)
-  puts factorial(-5)
+  print "Enter the integer you wish a factorial for: "
+  num = gets.chomp.to_i
+  puts "the factorial for #{num} is: " + factorial(num).to_s
+
