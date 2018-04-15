@@ -53,5 +53,3 @@ puts "Bed wetting is an issue: " + wets_bed.to_s
   puts factorial(30)
   puts factorial(0)
   puts factorial(-5)
-
-
