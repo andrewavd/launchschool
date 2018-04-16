@@ -53,3 +53,46 @@ puts "Bed wetting is an issue: " + wets_bed.to_s
   num = gets.chomp.to_i
   puts "the factorial for #{num} is: " + factorial(num).to_s
 
+# Civilazations III
+M = "land"
+o = "water"
+
+world = [[o,o,o,o,o,M,o,o,o,o,o],
+         [o,o,o,o,M,M,o,o,o,o,o],
+         [o,o,o,M,o,o,o,o,M,M,o],
+         [o,o,o,M,o,o,o,o,o,M,o],
+         [o,o,o,M,o,M,M,o,o,o,o],
+         [o,o,o,o,M,M,M,M,o,o,o],
+         [o,o,o,M,M,M,M,M,M,M,M,M,M],
+         [M,M,M,M,M,o,M,M,M,o,o],
+         [o,o,o,o,o,o,M,M,o,o,o],
+         [o,M,o,o,o,M,o,o,o,o,o],
+         [o,o,o,o,o,M,o,o,o,o,o]]
+
+def continent_size(world, row, col)
+  if row < 0 || col < 0 || row > world.length - 1  || col > (world[row].length) - 1
+    return 0
+  end
+  if world[row][col] != "land"
+    return 0
+  end
+
+  size = 1
+  world[row][col] = "counted land"
+
+  size = size + continent_size(world, row-1, col-1)
+  size = size + continent_size(world, row, col-1)
+  size = size + continent_size(world, row+1, col-1)
+  size = size + continent_size(world, row-1, col)
+  size = size + continent_size(world, row+1, col)
+  size = size + continent_size(world, row-1, col+1)
+  size = size + continent_size(world, row, col+1)
+  size = size + continent_size(world, row+1, col+1)
+  size
+end
+
+start_row = 0
+start_col = 5
+puts continent_size(world, start_row, start_col)
+
+
