@@ -99,35 +99,36 @@ start_col = 5
 puts continent_size(world, start_row, start_col)
 =end
 
-# sort an array of words w/o usong built in sort method
+# sort an array of words w/o using built in sort method
 # Building and sorting an array
 
-words = ['andy','andrew','anderson']
-sort_complete = true
-=begin
-words = []
-flag = true
-while flag
-  print "Please enter a word ('enter' to quit): "
-  word = gets.chomp
-  word != "" ? (words.push word) : flag = false
+#words = ['andy','andrew','anderson']
+def GetSortList()
+  words = []
+  while true
+    print "Please enter a word ('enter' to quit): "
+    (word = gets.chomp) == "" ? break: (words.push word)
+  end
+  return words
 end
-=end
 
-unsorted = words
-unsorted == [] ? sort_complete = false: sorted = [unsorted.pop]
-while unsorted.length > 0
-  test = unsorted.pop
-  done = false
-  sorted.each_with_index do |x, index|
-    if test < x
-      sorted.insert(index, test)
-      done = true
-      break
+def SortList(unsorted)
+  sorted = [unsorted.pop]
+  while unsorted.length > 0
+    test = unsorted.pop
+    if test.downcase > sorted[-1].downcase
+      sorted.push(test)
+    else
+      sorted.each_with_index do |x, index|
+        if test.downcase < x.downcase
+          sorted.insert(index, test)
+          break
+        end
+      end
     end
   end
-  if !done
-    sorted.push(test)
-  end
+  return sorted
 end
-puts sort_complete ? "This is sorted: #{sorted}": "There is nothing to sort!"
+
+unsorted = GetSortList()
+puts unsorted == [] ? "There is nothing to sort!": "This is the sorted list: #{SortList(unsorted)}"
