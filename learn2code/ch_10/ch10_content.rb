@@ -37,7 +37,8 @@ puts 'honestly. Thanks again.'
 puts
 puts "Bed wetting is an issue: " + wets_bed.to_s
 =end
-  # Factorial using recursion
+# Factorial using recursion
+=begin
   def factorial num
     if num < 0
       return puts "You can't take the factorial of a negative number."
@@ -52,8 +53,10 @@ puts "Bed wetting is an issue: " + wets_bed.to_s
   print "Enter the integer you wish a factorial for: "
   num = gets.chomp.to_i
   puts "the factorial for #{num} is: " + factorial(num).to_s
+=end
 
-# Civilazations III
+# Civilazations III - Find size of land mass
+=begin
 M = "land"
 o = "water"
 
@@ -94,5 +97,37 @@ end
 start_row = 0
 start_col = 5
 puts continent_size(world, start_row, start_col)
+=end
 
+# sort an array of words w/o usong built in sort method
+# Building and sorting an array
 
+words = ['andy','andrew','anderson']
+sort_complete = true
+=begin
+words = []
+flag = true
+while flag
+  print "Please enter a word ('enter' to quit): "
+  word = gets.chomp
+  word != "" ? (words.push word) : flag = false
+end
+=end
+
+unsorted = words
+unsorted == [] ? sort_complete = false: sorted = [unsorted.pop]
+while unsorted.length > 0
+  test = unsorted.pop
+  done = false
+  sorted.each_with_index do |x, index|
+    if test < x
+      sorted.insert(index, test)
+      done = true
+      break
+    end
+  end
+  if !done
+    sorted.push(test)
+  end
+end
+puts sort_complete ? "This is sorted: #{sorted}": "There is nothing to sort!"
