@@ -175,3 +175,16 @@ puts english_number(999999)
 puts english_number(2432678)
 puts english_number(17435983125)
 puts english_number(1000000000000)
+
+# Ninety nine bottles w/ english words
+# 99 botles of beer on the wall
+puts "How many bottles do you wish to start with?"
+bottles = gets.chomp.to_i
+
+#while bottles > 0
+bottles.times do
+  puts "#{english_number(bottles).capitalize} bottles of beer on the wall, #{english_number(bottles)} bottles of beer,"
+  puts "take one down, pass it around, #{english_number(bottles - 1)} bottles of beer on the wall!"
+  puts
+  bottles -= 1
+end
