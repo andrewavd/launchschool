@@ -103,7 +103,7 @@ puts continent_size(world, start_row, start_col)
 # Building and sorting an array
 
 #words = ['andy','andrew','anderson']
-def GetSortList()
+def GetList()
   words = []
   while true
     print "Please enter a word ('enter' to quit): "
@@ -130,5 +130,5 @@ def SortList(unsorted)
   return sorted
 end
 
-unsorted = GetSortList()
+unsorted = GetList()
 puts unsorted == [] ? "There is nothing to sort!": "This is the sorted list: #{SortList(unsorted)}"
