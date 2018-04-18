@@ -1,4 +1,4 @@
-def GetList()
+def get_list()
   words = []
   while true
     print "Please enter a word ('enter' to quit): "
@@ -7,7 +7,7 @@ def GetList()
   return words
 end
 
-def SortList(unsorted)
+def sort_list(unsorted)
   sorted = [unsorted.pop]
   while unsorted.length > 0
     test = unsorted.pop
@@ -25,7 +25,7 @@ def SortList(unsorted)
   return sorted
 end
 
-def ShuffleList(words)
+def shuffle_list(words)
   shuffled = []
 
   while words.length > 0
@@ -49,7 +49,7 @@ def ShuffleList(words)
 end
 =end
 
-original_list = GetList()
+original_list = get_list()
 unsorted = original_list.clone
 unshuffled = original_list.clone
 
@@ -57,6 +57,6 @@ if original_list == []
   puts "There is nothing to sort or shuffle!"
 else
   puts "This is the original list: #{original_list}."
-  puts "This is the sorted list: #{SortList(unsorted)}."
-  puts "This is the shuffled list: #{ShuffleList(unshuffled)}."
+  puts "This is the sorted list: #{sort_list(unsorted)}."
+  puts "This is the shuffled list: #{shufflelist(unshuffled)}."
 end
