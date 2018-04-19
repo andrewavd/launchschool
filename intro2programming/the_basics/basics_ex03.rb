@@ -19,5 +19,5 @@ puts movie_list[:'Player One']
 puts
 
 # iteration
-movie_list.each { |name, year| puts "#{year}" }
+movie_list.each { |title, year| puts "#{year}" }
   
