@@ -4,6 +4,10 @@ def prompt(message)
   print("=> #{message}")
 end
 
+def strip_formatting(user_input)
+  user_input.gsub(/[$,%]|\.00/, "")
+end
+
 def valid_float?(num)
   num.to_f.to_s == num
 end
@@ -20,7 +24,9 @@ def obtain_loan_specs(loan_parameter)
   loan_spec = ''
   valid_input = false
   until valid_input
-    loan_spec = gets.chomp()
+    loan_spec = strip_formatting(gets.chomp())
+    #loan_spec = strip_formatting(loan_spec)
+    #puts loan_spec
     if loan_spec.to_i < 0
       prompt("Invalid, #{loan_parameter} can't be negative - Please re-enter: ")
     elsif valid_float?(loan_spec) || valid_int?(loan_spec)
