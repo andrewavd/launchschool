@@ -24,7 +24,7 @@ def validate_input(loan_spec, loan_parameter)
   if invalid_negative?(loan_spec)
     prompt("Invalid, #{loan_parameter} can't be negative - Please re-enter: ")
   elsif valid_float?(loan_spec) || valid_int?(loan_spec)
-    valid_input = true
+    valid_input
   else
     prompt("'#{loan_spec}' invalid #{loan_parameter} - Please re-enter: ")
   end
@@ -36,7 +36,7 @@ def obtain_loan_specs(loan_parameter)
   until valid_input
     loan_spec = strip_formatting(gets.chomp())
     valid_input = validate_input(loan_spec, loan_parameter)
-   end
+  end
   loan_spec
 end
 
@@ -45,14 +45,14 @@ def invalid_duration_type?(operation)
 end
 
 def convert_duration(duration_unit)
-  duration_units = if duration_unit.start_with?('m')
+  if duration_unit.start_with?('m')
     'months'
   else
     'years'
   end
 end
 
-def obtain_duration_unit()
+def obtain_duration_unit
   duration_unit = ''
   valid_duration = false
   until valid_duration
