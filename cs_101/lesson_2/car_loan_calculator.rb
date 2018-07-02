@@ -44,6 +44,28 @@ def invalid_duration_type?(operation)
   !%w(m month months y year years).include?(operation)
 end
 
+def convert_duration(duration_unit)
+  duration_units = if duration_unit.start_with?('m')
+    'months'
+  else
+    'years'
+  end
+end
+
+def obtain_duration_unit()
+  duration_unit = ''
+  valid_duration = false
+  until valid_duration
+    duration_unit = gets.chomp().downcase
+    if invalid_duration_type?(duration_unit)
+      prompt("Must choose (M)onths or (Y)ears: ")
+    else
+      valid_duration = true
+    end
+  end
+  convert_duration(duration_unit)
+end
+
 def calculate_loan(loan_amt, apr, duration)
   if apr == 0
     loan_amt / duration
@@ -65,22 +87,8 @@ until terminate_calculator
   monthly_apr = apr / 12
 
   prompt('Would you prefer loan length to be (M)onths or (Y)ears? ')
-  duration_units = ''
-  valid_duration = false
-  until valid_duration
-    duration_units = gets.chomp().downcase
-    if invalid_duration_type?(duration_units)
-      prompt("Must choose (M)onths or (Y)ears: ")
-    else
-      valid_duration = true
-    end
-  end
+  duration_units = obtain_duration_unit()
 
-  duration_units = if duration_units.start_with?('m')
-                     'months'
-                   else
-                     'years'
-                   end
   prompt("Enter loan length (#{duration_units}): ")
 
   loan_duration_months = obtain_loan_specs('loan duration').to_i
