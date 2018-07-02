@@ -8,6 +8,10 @@ def strip_formatting(user_input)
   user_input.gsub(/[$,%]|\.00/, "")
 end
 
+def invalid_negative?(num)
+  num.to_i < 0
+end
+
 def valid_float?(num)
   num.to_f.to_s == num
 end
@@ -16,8 +20,14 @@ def valid_int?(num)
   num.to_i.to_s == num
 end
 
-def invalid_duration_type?(operation)
-  !%w(m month months y year years).include?(operation)
+def validate_input(loan_spec, loan_parameter)
+  if invalid_negative?(loan_spec)
+    prompt("Invalid, #{loan_parameter} can't be negative - Please re-enter: ")
+  elsif valid_float?(loan_spec) || valid_int?(loan_spec)
+    valid_input = true
+  else
+    prompt("'#{loan_spec}' invalid #{loan_parameter} - Please re-enter: ")
+  end
 end
 
 def obtain_loan_specs(loan_parameter)
@@ -25,17 +35,13 @@ def obtain_loan_specs(loan_parameter)
   valid_input = false
   until valid_input
     loan_spec = strip_formatting(gets.chomp())
-    #loan_spec = strip_formatting(loan_spec)
-    #puts loan_spec
-    if loan_spec.to_i < 0
-      prompt("Invalid, #{loan_parameter} can't be negative - Please re-enter: ")
-    elsif valid_float?(loan_spec) || valid_int?(loan_spec)
-      valid_input = true
-    else
-      prompt("'#{loan_spec}' invalid #{loan_parameter} - Please re-enter: ")
-    end
-  end
+    valid_input = validate_input(loan_spec, loan_parameter)
+   end
   loan_spec
+end
+
+def invalid_duration_type?(operation)
+  !%w(m month months y year years).include?(operation)
 end
 
 def calculate_loan(loan_amt, apr, duration)
@@ -85,7 +91,7 @@ until terminate_calculator
   loan_payment = calculate_loan(loan_amount, monthly_apr, loan_duration_months)
   puts("Your monthly loan payment is: $#{format('%02.2f', loan_payment)}")
 
-  prompt("Would you like to calculate another loan (Y/n)?")
+  prompt("Would you like to calculate another loan (Y/n)? ")
   perform_another = gets.chomp()
   terminate_calculator = true if !perform_another.downcase.start_with?('y')
 end
