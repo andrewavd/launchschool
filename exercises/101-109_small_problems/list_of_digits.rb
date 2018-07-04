@@ -7,7 +7,7 @@ def digit_list(int)
   int.digits.reverse!
 end
 
-numbers = [12345, 7, 375290, 444]
+numbers = [123_45, 7, 375_290, 444]
 
 numbers.each do |n|
   p digit_list(n)
