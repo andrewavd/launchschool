@@ -1,4 +1,6 @@
 VALID_CHOICES = ['Rock', 'Paper', 'Scissors', 'Spock', 'Lizard']
+SET_WIN = 5
+MATCH_WIN = 3
 
 def initial_set
   {
@@ -139,12 +141,12 @@ def update_stats(stats)
 end
 
 def display_sets_winner(stats)
-  if stats[:set_stats][:player_wins] == 5
+  if stats[:set_stats][:player_wins] == SET_WIN
     stats[:player_set_wins] += 1
-    puts("#{stats[:name]} wins set with 5 won throws!")
-  elsif stats[:set_stats][:pc_wins] == 5
+    puts("#{stats[:name]} wins set with #{SET_WIN} won throws!")
+  elsif stats[:set_stats][:pc_wins] == SET_WIN
     stats[:pc_set_wins] += 1
-    puts('Computer wins set with 5 won throws!')
+    puts("Computer wins set with #{SET_WIN} won throws!")
   end
 end
 
@@ -157,22 +159,22 @@ def display_sets_stats(stats)
 end
 
 def sets_winner?(stats)
-  stats[:set_stats][:player_wins] == 5 || \
-    stats[:set_stats][:pc_wins] == 5
+  stats[:set_stats][:player_wins] == SET_WIN || \
+    stats[:set_stats][:pc_wins] == SET_WIN
 end
 
 def display_match_winner(stats)
-  if stats[:player_set_wins] == 3
-    puts("#{stats[:name]} wins match with 3 won sets!")
+  if stats[:player_set_wins] == MATCH_WIN
+    puts("#{stats[:name]} wins match with #{MATCH_WIN} won sets!")
     puts("Game, Set and Match! Congratulations to #{stats[:name]}")
-  elsif stats[:pc_set_wins] == 3
-    puts('Computer wins match with 3 won sets!')
+  elsif stats[:pc_set_wins] == MATCH_WIN
+    puts("Computer wins match with #{MATCH_WIN} won sets!")
     puts('Game, Set and Match! Congratulations to the Computer')
   end
 end
 
 def match_winner?(stats)
-  stats[:player_set_wins] == 3 || stats[:pc_set_wins] == 3
+  stats[:player_set_wins] == MATCH_WIN || stats[:pc_set_wins] == MATCH_WIN
 end
 
 def end_match?
@@ -188,8 +190,8 @@ player_name = stats[:name]
 
 display_title("Welcome #{player_name} to #{VALID_CHOICES.join(', ')}!")
 puts('(Q)uit to exit at any time.')
-puts('First player to win 5 throws wins the set!')
-puts('First player to win 3 sets wins the match!')
+puts("First player to win #{SET_WIN} throws wins the set!")
+puts("First player to win #{MATCH_WIN} sets wins the match!")
 
 until stop_match
   players_throw = obtain_player_input
