@@ -39,7 +39,7 @@ def validate_name(first_name)
   if first_name == '' || first_name == ' '
     'Player One'
   else
-    first_name.capitalize
+    first_name.lstrip.rstrip.capitalize
   end
 end
 
