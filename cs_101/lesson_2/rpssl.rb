@@ -18,8 +18,15 @@ def initial_match
   {
     name: '',
     set_count: 1,
+    throws: 0,
     player_set_wins: 0,
+    player_total_wins: 0,
+    player_total_pct: 0.0,
     pc_set_wins: 0,
+    pc_total_wins: 0,
+    pc_total_pct: 0.0,
+    total_draws: 0,
+    draw_total_pct: 0.0,
     set_stats:  initial_set
   }
 end
@@ -136,15 +143,15 @@ def display_winner(players_throw, computers_throw, stats)
   game_winner == '' ? puts("It's a draw!") : puts("#{game_winner} wins!")
 end
 
-def calc_pct(stats, stat_pct)
-  stats[:set_stats][stat_pct].to_f / stats[:set_stats][:throws] * 100
+def calc_pct(key, stat_pct)
+  key[stat_pct].to_f / key[:throws] * 100
 end
 
-def update_stats(stats)
+def update_set_stats(stats)
   stats[:set_stats][:throws] += 1
-  stats[:set_stats][:player_pct] = calc_pct(stats, :player_wins)
-  stats[:set_stats][:pc_pct] = calc_pct(stats, :pc_wins)
-  stats[:set_stats][:draw_pct] = calc_pct(stats, :draws)
+  stats[:set_stats][:player_pct] = calc_pct(stats[:set_stats], :player_wins)
+  stats[:set_stats][:pc_pct] = calc_pct(stats[:set_stats], :pc_wins)
+  stats[:set_stats][:draw_pct] = calc_pct(stats[:set_stats], :draws)
 end
 
 def display_sets_winner(stats)
@@ -159,11 +166,22 @@ end
 
 def display_sets_stats(stats)
   display_title('Game and Set!')
-  puts("Total throws in set: #{stats[:set_stats][:throws]}")
+  puts("Total throws in set #{stats[:set_count]}:" \
+    " #{stats[:set_stats][:throws]}")
   puts("#{stats[:name]} win %: " \
     "#{format('%02.2f', stats[:set_stats][:player_pct])}%")
   puts("Computer win %: #{format('%02.2f', stats[:set_stats][:pc_pct])}%")
   puts("% Draws: #{format('%02.2f', stats[:set_stats][:draw_pct])}%")
+end
+
+def update_match_stats(stats)
+  stats[:throws] += stats[:set_stats][:throws]
+  stats[:player_total_wins] += stats[:set_stats][:player_wins]
+  stats[:pc_total_wins] += stats[:set_stats][:pc_wins]
+  stats[:total_draws] += stats[:set_stats][:draws]
+  stats[:player_total_pct] = calc_pct(stats, :player_total_wins)
+  stats[:pc_total_pct] = calc_pct(stats, :pc_total_wins)
+  stats[:draw_total_pct] = calc_pct(stats, :total_draws)
 end
 
 def sets_winner?(stats)
@@ -174,12 +192,22 @@ end
 def display_match_winner(stats)
   display_title('Game, Set and Match!')
   if stats[:player_set_wins] == MATCH_WIN
-    puts("#{stats[:name]} wins match: #{MATCH_WIN} sets to #{stats[:pc_set_wins]}!")
+    puts("#{stats[:name]} wins match: #{MATCH_WIN}" \
+      " sets to #{stats[:pc_set_wins]}!")
     puts("Congratulations to #{stats[:name]}!")
   elsif stats[:pc_set_wins] == MATCH_WIN
-    puts("Computer wins match: #{MATCH_WIN} sets to #{stats[:player_set_wins]}!")
+    puts("Computer wins match: #{MATCH_WIN}" \
+      " sets to #{stats[:player_set_wins]}!")
     puts('Congratulations to the Computer!')
   end
+end
+
+def display_match_stats(stats)
+  puts("Total throws in match: #{stats[:throws]}")
+  puts("#{stats[:name]} win %: " \
+    "#{format('%02.2f', stats[:player_total_pct])}%")
+  puts("Computer win %: #{format('%02.2f', stats[:pc_total_pct])}%")
+  puts("% Draws: #{format('%02.2f', stats[:draw_total_pct])}%")
 end
 
 def match_winner?(stats)
@@ -207,16 +235,17 @@ until stop_match
   break if players_throw == 'Quit'
   computers_throw = obtain_computer_input
   display_winner(players_throw, computers_throw, stats)
-  update_stats(stats)
+  update_set_stats(stats)
   display_set_score(stats)
   if sets_winner?(stats)
     display_sets_winner(stats)
     display_sets_stats(stats)
+    update_match_stats(stats)
     stats[:set_stats] = initial_set
     stats[:set_count] += 1
     if match_winner?(stats)
       display_match_winner(stats)
-      # display_match_stats(stats)
+      display_match_stats(stats)
       stats = initial_match
       stats[:name] = player_name
     end
