@@ -92,16 +92,14 @@ def obtain_computer_input
 end
 
 def display_set_score(stats)
-  display_title('Current Set Results')
+  display_title("Set #{stats[:set_count]} Score")
   puts("#{stats[:name]}: #{stats[:set_stats][:player_wins]} wins.")
   puts("Computer: #{stats[:set_stats][:pc_wins]} wins.")
   puts("Draws: #{stats[:set_stats][:draws]} ties.")
 end
 
 def display_match_score(stats)
-  display_set_score(stats)
-  display_title('Current Match Results')
-  puts("Set # #{stats[:set_count]}")
+  display_title("Match Score")
   puts("#{stats[:name]}: #{stats[:player_set_wins]} wins.")
   puts("Computer: #{stats[:pc_set_wins]} wins.")
 end
@@ -132,6 +130,7 @@ def update_wins(players_throw, computers_throw, stats)
 end
 
 def display_winner(players_throw, computers_throw, stats)
+  puts
   puts("#{stats[:name]}: #{players_throw} vs Computer: #{computers_throw}")
   game_winner = update_wins(players_throw, computers_throw, stats)
   game_winner == '' ? puts("It's a draw!") : puts("#{game_winner} wins!")
@@ -159,6 +158,7 @@ def display_sets_winner(stats)
 end
 
 def display_sets_stats(stats)
+  display_title('Game and Set!')
   puts("Total throws in set: #{stats[:set_stats][:throws]}")
   puts("#{stats[:name]} win %: " \
     "#{format('%02.2f', stats[:set_stats][:player_pct])}%")
@@ -172,12 +172,13 @@ def sets_winner?(stats)
 end
 
 def display_match_winner(stats)
+  display_title('Game, Set and Match!')
   if stats[:player_set_wins] == MATCH_WIN
-    puts("#{stats[:name]} wins match with #{MATCH_WIN} won sets!")
-    puts("Game, Set and Match! Congratulations to #{stats[:name]}")
+    puts("#{stats[:name]} wins match: #{MATCH_WIN} sets to #{stats[:pc_set_wins]}!")
+    puts("Congratulations to #{stats[:name]}!")
   elsif stats[:pc_set_wins] == MATCH_WIN
-    puts("Computer wins match with #{MATCH_WIN} won sets!")
-    puts('Game, Set and Match! Congratulations to the Computer')
+    puts("Computer wins match: #{MATCH_WIN} sets to #{stats[:player_set_wins]}!")
+    puts('Congratulations to the Computer!')
   end
 end
 
@@ -207,19 +208,22 @@ until stop_match
   computers_throw = obtain_computer_input
   display_winner(players_throw, computers_throw, stats)
   update_stats(stats)
-  display_match_score(stats)
+  display_set_score(stats)
   if sets_winner?(stats)
-    display_title('Game and Set!')
     display_sets_winner(stats)
     display_sets_stats(stats)
     stats[:set_stats] = initial_set
     stats[:set_count] += 1
     if match_winner?(stats)
       display_match_winner(stats)
+      # display_match_stats(stats)
       stats = initial_match
       stats[:name] = player_name
     end
     stop_match = end_match?
+    if !stop_match
+      display_match_score(stats)
+    end
   end
 end
 
