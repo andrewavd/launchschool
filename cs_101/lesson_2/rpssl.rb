@@ -28,9 +28,17 @@ def prompt(message)
   print("=> #{message}")
 end
 
+def validate_name(first_name)
+  if first_name == ''
+    'Player One'
+  else
+    first_name.capitalize
+  end
+end
+
 def obtain_name
   prompt("What's your first name: ")
-  gets.chomp.capitalize
+  validate_name(gets.chomp)
 end
 
 def title_underscore(reps)
