@@ -178,7 +178,7 @@ end
 def end_match?
   puts
   prompt("Would you like to continue playing (Y/n)? ")
-  gets().chomp().downcase() != 'y' ? true : false
+  gets().chomp().downcase() != 'y'
 end
 
 stop_match = false
