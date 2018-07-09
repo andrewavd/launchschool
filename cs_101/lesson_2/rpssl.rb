@@ -36,7 +36,7 @@ def prompt(message)
 end
 
 def validate_name(first_name)
-  if first_name == ''
+  if first_name == '' || ' '
     'Player One'
   else
     first_name.capitalize
