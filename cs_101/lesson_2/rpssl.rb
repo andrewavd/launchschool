@@ -36,10 +36,10 @@ def prompt(message)
 end
 
 def validate_name(first_name)
-  if first_name == '' || first_name == ' '
+  if first_name == '' || first_name.strip.empty?
     'Player One'
   else
-    first_name.lstrip.rstrip.capitalize
+    first_name.strip.capitalize
   end
 end
 
