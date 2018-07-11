@@ -1,4 +1,5 @@
-# Write a method that counts the number of occurrences of each element in a given array.
+# Write a method that counts the number of occurrences
+# of each element in a given array.
 
 def count_occurrences(vehicles)
   unique = vehicles.uniq
@@ -7,6 +8,6 @@ def count_occurrences(vehicles)
   end
 end
 
-vehicles = ['car', 'car', 'truck', 'car', 'SUV', 'truck', 'motorcycle', 'motorcycle', 'car', 'truck']
+vehicles = %w(car car truck car SUV truck motorcycle motorcycle car truck)
 
 count_occurrences(vehicles)
