@@ -2,9 +2,8 @@
 # and returns the same string with the words in reverse order.
 
 def reverse_sentence(sentence)
-  sentence.split
-  sentence.reverse!
-  sentence.join(' ')
+  sentence_arr = sentence.split.reverse!
+  sentence_arr.join(' ')
   # sentence.split.reverse.join(' ')
 end
 
