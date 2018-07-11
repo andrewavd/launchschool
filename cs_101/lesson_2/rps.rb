@@ -43,9 +43,9 @@ def who_wins?(player1, player2)
 end
 
 def display_winner(players_choice, computers_choice)
-  if who_wins(players_choice, computers_choice)
+  if who_wins?(players_choice, computers_choice)
     puts("Player wins!")
-  elsif who_wins?(computer_choice, player_choice)
+  elsif who_wins?(computers_choice, players_choice)
     puts("Computer wins!")
   else
     puts("It's a tie!")
