@@ -4,7 +4,7 @@
 
 def stringy(length)
   stringy = ''
-  length.times { |x| x % 2 != 0 ? stringy += '0' : stringy += '1' }
+  length.times { |x| stringy += x.odd? ? '0' : '1' }
   stringy
 end
 
