@@ -28,7 +28,7 @@ loop do
   number = rand(100)
   #break if number >= 0 && number <= 10 # My way
   break if number.between?(0, 10) # Solution provided
-  puts number # I chose not to print the number that breals the loop.
+  puts number # I chose not to print the number that breaks the loop.
 end
 
 # Conditional loop
