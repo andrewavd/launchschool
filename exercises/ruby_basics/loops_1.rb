@@ -1,7 +1,7 @@
 # Runaway Loop
 
-# The code below is an example of an inginite loop. The name describes exactly what it does:
-# loop infinitely. This loop isn't udeful in a real program, though.
+# The code below is an example of an infinite loop. The name describes exactly what it does:
+# loop infinitely. This loop isn't useful in a real program, though.
 # Modify the code so the loop stops after the first itratiion.
 puts
 puts "'Runaway Loop'"
@@ -70,7 +70,7 @@ count = 1 # My addition
 while say_hello
   puts "#{count}) Hello!"
   count += 1
-  say_hello = false if count > 5 # I added if statement
+  say_hello = false if count > 5 # I added if modifier
 end
 
 # Print While
