@@ -8,6 +8,8 @@ MATCH_WIN = 2
 def initialize_match
   {
     player1_name: '',
+    player2_name: 'Computer',
+    current_player: self[:player1_name],
     player_wins: 0,
     computer_wins: 0,
     draws: 0
@@ -97,57 +99,7 @@ def thinking()
   sleep 1
 end
 
-=begin
-def arbitrary_move(brd)
-  thinking()
-  validate_move(brd).sample
-end
-
-def play_middle_square(brd)
-  thinking()
-  if brd[5] != PLAYER_MARK && brd[5] != COMPUTER_MARK
-    move = brd[5].to_i
-    return update_board(brd, move, COMPUTER_MARK)
-  end
-end
-
-def ai_move(brd)
-  players = [COMPUTER_MARK, PLAYER_MARK]
-
-  winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-  [[1, 5, 9], [3, 5, 7]]
-
-  move = 0
-
-  players.each do |mark|
-    winning_lines.each do |line|
-      offense = []
-      line.each do |sq|
-        offense << brd[sq]
-      end
-      if offense.count(mark) == 2
-        offense.each do |element|
-          if element != PLAYER_MARK && element != COMPUTER_MARK
-            move = brd[element.to_i].to_i
-            thinking()
-            return update_board(brd, move, mark)
-          end
-        end
-      end
-    end
-  end
-
-  #return update_board(brd, brd[5], COMPUTER_MARK) if play_middle_square(brd)
-  #update_board(brd, arbitrary_move(brd), COMPUTER_MARK)
-end
-=end
-
 def computer_move!(brd)
-  # ai_move(brd)
-  #return if update_board(brd, brd[5], COMPUTER_MARK) if play_middle_square(brd)
-  #update_board(brd, arbitrary_move(brd), COMPUTER_MARK)
-
   winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
   [[1, 5, 9], [3, 5, 7]]
@@ -278,8 +230,6 @@ puts "Single Game - No score is kept."
 prompt("Please enter your first name: ")
 stats[:player1_name] = gets.chomp
 keep_score = tournament_or_single?()
-puts "keep_score = #{keep_score}"
-sleep 2
 
 =begin
 prompt("(O)ne or (t)wo players? ")
@@ -288,10 +238,14 @@ if num_of_players == 2
   prompt("Enter second player first name: ")
   second_name = gets.chomp
 end
-
-prompt("Choose who goes first : ")
-goes_first = gets.chomp
 =end
+
+def who_goes_first?(stats)
+  prompt("Choose who goes first : ")
+  stats[:current_player] = gets.chomp
+end
+
+current_player = who_goes_first?(stats)
 
 until sayonara
   board = initialize_board
@@ -320,7 +274,7 @@ until sayonara
     puts "It's a draw!"
   end
 
-  puts "Player wins: #{stats[:player_wins]} Computer wins: #{stats[:computer_wins]} Draws: #{stats[:draws]}"
+  puts "#{stats[:player1_name]} wins: #{stats[:player_wins]} Computer wins: #{stats[:computer_wins]} Draws: #{stats[:draws]}"
 
   if keep_score
     if tournament_winner?(stats)
@@ -330,6 +284,13 @@ until sayonara
         keep_score = false
         sayonara = true
       end
+    end
+    puts
+    puts "Press <enter> to continue..."
+    puts "or (q)uit to withdraw..."
+    answer = gets.chomp
+    if answer == "q"
+      sayonara = true
     end
   else
     if !play_again?()
