@@ -9,7 +9,7 @@ def initialize_match
   {
     player1_name: '',
     player2_name: 'Computer',
-    current_player: self[:player1_name],
+    current_player: '',
     player_wins: 0,
     computer_wins: 0,
     draws: 0
@@ -96,10 +96,12 @@ end
 
 def thinking()
   puts "Computer thinking..."
-  sleep 1
+  sleep 2
 end
 
 def computer_move!(brd)
+  thinking()
+
   winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
   [[1, 5, 9], [3, 5, 7]]
@@ -115,7 +117,7 @@ def computer_move!(brd)
       offense.each do |element|
         if element != PLAYER_MARK && element != COMPUTER_MARK
           move = brd[element.to_i].to_i
-          thinking()
+          #thinking()
           return update_board(brd, move, COMPUTER_MARK)
         end
       end
@@ -131,7 +133,7 @@ def computer_move!(brd)
       defense.each do |element|
         if element != PLAYER_MARK && element != COMPUTER_MARK
           move = brd[element.to_i].to_i
-          thinking()
+          #thinking()
           return update_board(brd, move, COMPUTER_MARK)
         end
       end
@@ -145,8 +147,19 @@ def computer_move!(brd)
   end
 
   move = validate_move(brd).sample
-  thinking()
+  #thinking()
   update_board(brd, move, COMPUTER_MARK)
+end
+
+def make_move(brd, stats)
+  if stats[:current_player] == stats[:player1_name]
+    player_move!(brd, stats)
+    stats[:current_player] = stats[:player2_name]
+  else
+    computer_move!(brd)
+    stats[:current_player] = stats[:player1_name]
+  end
+
 end
 
 def update_match(mark, stats)
@@ -245,18 +258,15 @@ def who_goes_first?(stats)
   stats[:current_player] = gets.chomp
 end
 
-current_player = who_goes_first?(stats)
+who_goes_first?(stats)
 
 until sayonara
   board = initialize_board
 
   until game_over?(board, stats)
     display_board(board)
-    player_move!(board, stats)
+    make_move(board, stats)
     break if game_over?(board, stats)
-    display_board(board)
-    computer_move!(board)
-    display_board(board)
   end
 
   display_board(board)
@@ -304,3 +314,11 @@ until sayonara
 end
 
 puts "Thank you for playing - Good bye."
+
+=begin
+player_move!(board, stats)
+break if game_over?(board, stats)
+display_board(board)
+computer_move!(board)
+display_board(board)
+=end
