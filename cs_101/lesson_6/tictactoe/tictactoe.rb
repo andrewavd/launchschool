@@ -11,9 +11,10 @@ def initialize_match
     player2: { name: 'Computer', mark: COMPUTER_MARK },
     two_player: false,
     current_player: '',
-    player_wins: 0,
-    computer_wins: 0,
-    draws: 0
+    player1_wins: 0,
+    player2_wins: 0,
+    draws: 0,
+    skill_level: ''
   }
 end
 
@@ -107,53 +108,55 @@ end
 def computer_move!(brd, stats)
   thinking()
 
-  winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-  [[1, 5, 9], [3, 5, 7]]
+  case stats[:skill_level]
+  when 'novice'
+    move = validate_move(brd).sample
+    update_board(brd, move, stats)
+  when 'skilled'
+    winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+    [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+    [[1, 5, 9], [3, 5, 7]]
 
-  move = 0
+    move = 0
 
-  winning_lines.each do |line|
-    offense = []
-    line.each do |sq|
-      offense << brd[sq]
-    end
-    if offense.count(COMPUTER_MARK) == 2
-      offense.each do |element|
-        if element != PLAYER_MARK && element != COMPUTER_MARK
-          move = brd[element.to_i].to_i
-          #thinking()
-          return update_board(brd, move, stats)
+    winning_lines.each do |line|
+      offense = []
+      line.each do |sq|
+        offense << brd[sq]
+      end
+      if offense.count(COMPUTER_MARK) == 2
+        offense.each do |element|
+          if element != PLAYER_MARK && element != COMPUTER_MARK
+            move = brd[element.to_i].to_i
+            return update_board(brd, move, stats)
+          end
         end
       end
     end
-  end
 
-  winning_lines.each do |line|
-    defense = []
-    line.each do |sq|
-      defense << brd[sq]
-    end
-    if defense.count(PLAYER_MARK) == 2
-      defense.each do |element|
-        if element != PLAYER_MARK && element != COMPUTER_MARK
-          move = brd[element.to_i].to_i
-          #thinking()
-          return update_board(brd, move, stats)
+    winning_lines.each do |line|
+      defense = []
+      line.each do |sq|
+        defense << brd[sq]
+      end
+      if defense.count(PLAYER_MARK) == 2
+        defense.each do |element|
+          if element != PLAYER_MARK && element != COMPUTER_MARK
+            move = brd[element.to_i].to_i
+            return update_board(brd, move, stats)
+          end
         end
       end
     end
+
+    if brd[5] != PLAYER_MARK && brd[5] != COMPUTER_MARK
+      move = brd[5].to_i
+      return update_board(brd, move, stats)
+    end
+
+    move = validate_move(brd).sample
+    update_board(brd, move, stats)
   end
-
-
-  if brd[5] != PLAYER_MARK && brd[5] != COMPUTER_MARK
-    move = brd[5].to_i
-    return update_board(brd, move, stats)
-  end
-
-  move = validate_move(brd).sample
-  #thinking()
-  update_board(brd, move, stats)
 end
 
 def make_move(brd, stats)
@@ -175,9 +178,9 @@ end
 
 def update_match(mark, stats)
   if mark == 'X'
-    stats[:player_wins] += 1
+    stats[:player1_wins] += 1
   elsif mark == 'O'
-    stats[:computer_wins] += 1
+    stats[:player2_wins] += 1
   else
     stats[:draws] += 1
   end
@@ -207,14 +210,14 @@ def detect_winner(brd, stats)
 end
 
 def tournament_winner?(stats)
-  stats[:player_wins] == MATCH_WIN || stats[:computer_wins] == MATCH_WIN || stats[:draws] == MATCH_WIN
+  stats[:player1_wins] == MATCH_WIN || stats[:player2_wins] == MATCH_WIN || stats[:draws] == MATCH_WIN
 end
 
 def display_tournament_winner(stats)
-  if stats[:player_wins] == MATCH_WIN
-    puts "#{stats[:player1][:name]} wins tournament #{stats[:player_wins]} - #{stats[:computer_wins]}."
-  elsif stats[:computer_wins] == MATCH_WIN
-    puts "#{stats[:player2][:name]} wins tournament #{stats[:computer_wins]} - #{stats[:player_wins]}."
+  if stats[:player1_wins] == MATCH_WIN
+    puts "#{stats[:player1][:name]} wins tournament #{stats[:player1_wins]} - #{stats[:player2_wins]}."
+  elsif stats[:player2_wins] == MATCH_WIN
+    puts "#{stats[:player2][:name]} wins tournament #{stats[:player2_wins]} - #{stats[:player1_wins]}."
   else
     puts "The match has ended in a draw!"
   end
@@ -260,6 +263,9 @@ if num_of_players == '2'
   stats[:two_player] = true
   prompt("Enter second player first name: ")
   stats[:player2][:name] = gets.chomp
+else
+  prompt('What skill level do you want the Computer to play at (novice, skilled or expert)? ')
+  stats[:skill_level] = gets.chomp
 end
 
 keep_score = tournament_or_single?()
@@ -295,7 +301,7 @@ until sayonara
     puts "It's a draw!"
   end
 
-  puts "#{stats[:player1][:name]} wins: #{stats[:player_wins]} #{stats[:player2][:name]} wins: #{stats[:computer_wins]} Draws: #{stats[:draws]}"
+  puts "#{stats[:player1][:name]} wins: #{stats[:player1_wins]} #{stats[:player2][:name]} wins: #{stats[:player2_wins]} Draws: #{stats[:draws]}"
 
   if keep_score
     if tournament_winner?(stats)
