@@ -7,8 +7,9 @@ MATCH_WIN = 2
 
 def initialize_match
   {
-    player1_name: '',
-    player2_name: 'Computer',
+    player1: { name: '', mark: PLAYER_MARK },
+    player2: { name: 'Computer', mark: COMPUTER_MARK },
+    two_player: false,
     current_player: '',
     player_wins: 0,
     computer_wins: 0,
@@ -49,8 +50,12 @@ def validate_move(brd)
   brd.keys.select { |num| brd[num] != PLAYER_MARK && brd[num] != COMPUTER_MARK }
 end
 
-def update_board(brd, move, mark)
-  brd[move] = mark
+def update_board(brd, move, stats)
+  if stats[:current_player] == stats[:player1][:name]
+    brd[move] = stats[:player1][:mark]
+  else
+    brd[move] = stats[:player2][:mark]
+  end
 end
 
 def joinor(arr, seperator = ', ', conjunction = "or")
@@ -83,7 +88,7 @@ def player_move!(brd, stats)
     valid_move = false
   end
   until valid_move
-    prompt("#{stats[:player1_name]} choose a square (#{joinor(validate_move(brd))}): ")
+    prompt("#{stats[:current_player]} choose a square (#{joinor(validate_move(brd))}): ")
     move = gets.chomp.to_i
     if validate_move(brd).include?(move)
       valid_move = true
@@ -91,7 +96,7 @@ def player_move!(brd, stats)
       puts("That square is unavailable.")
     end
   end
-  update_board(brd, move, PLAYER_MARK)
+  update_board(brd, move, stats)
 end
 
 def thinking()
@@ -99,7 +104,7 @@ def thinking()
   sleep 2
 end
 
-def computer_move!(brd)
+def computer_move!(brd, stats)
   thinking()
 
   winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
@@ -118,7 +123,7 @@ def computer_move!(brd)
         if element != PLAYER_MARK && element != COMPUTER_MARK
           move = brd[element.to_i].to_i
           #thinking()
-          return update_board(brd, move, COMPUTER_MARK)
+          return update_board(brd, move, stats)
         end
       end
     end
@@ -134,7 +139,7 @@ def computer_move!(brd)
         if element != PLAYER_MARK && element != COMPUTER_MARK
           move = brd[element.to_i].to_i
           #thinking()
-          return update_board(brd, move, COMPUTER_MARK)
+          return update_board(brd, move, stats)
         end
       end
     end
@@ -143,23 +148,29 @@ def computer_move!(brd)
 
   if brd[5] != PLAYER_MARK && brd[5] != COMPUTER_MARK
     move = brd[5].to_i
-    return update_board(brd, move, COMPUTER_MARK)
+    return update_board(brd, move, stats)
   end
 
   move = validate_move(brd).sample
   #thinking()
-  update_board(brd, move, COMPUTER_MARK)
+  update_board(brd, move, stats)
 end
 
 def make_move(brd, stats)
-  if stats[:current_player] == stats[:player1_name]
+  if stats[:two_player]
     player_move!(brd, stats)
-    stats[:current_player] = stats[:player2_name]
+    if stats[:current_player] == stats[:player1][:name]
+      stats[:current_player] = stats[:player2][:name]
+    else
+      stats[:current_player] = stats[:player1][:name]
+    end
+  elsif stats[:current_player] == stats[:player1][:name]
+    player_move!(brd, stats)
+    stats[:current_player] = stats[:player2][:name]
   else
-    computer_move!(brd)
-    stats[:current_player] = stats[:player1_name]
+    computer_move!(brd, stats)
+    stats[:current_player] = stats[:player1][:name]
   end
-
 end
 
 def update_match(mark, stats)
@@ -185,11 +196,11 @@ def detect_winner(brd, stats)
     if brd[line[0]] == PLAYER_MARK &&
        brd[line[1]] == PLAYER_MARK &&
        brd[line[2]] == PLAYER_MARK
-       return stats[:player1_name]
+       return stats[:player1][:name]
     elsif brd[line[0]] == COMPUTER_MARK &&
       brd[line[1]] == COMPUTER_MARK &&
       brd[line[2]] == COMPUTER_MARK
-      return 'Computer'
+      return stats[:player2][:name]
     end
   end
   nil
@@ -201,9 +212,9 @@ end
 
 def display_tournament_winner(stats)
   if stats[:player_wins] == MATCH_WIN
-    puts "#{stats[:player1_name]} wins tournament #{stats[:player_wins]} - #{stats[:computer_wins]}."
+    puts "#{stats[:player1][:name]} wins tournament #{stats[:player_wins]} - #{stats[:computer_wins]}."
   elsif stats[:computer_wins] == MATCH_WIN
-    puts "Computer wins tournament #{stats[:computer_wins]} - #{stats[:player_wins]}."
+    puts "#{stats[:player2][:name]} wins tournament #{stats[:computer_wins]} - #{stats[:player_wins]}."
   else
     puts "The match has ended in a draw!"
   end
@@ -241,17 +252,17 @@ puts "Tournament style - First player to win 5 games wins the tournament."
 puts "Single Game - No score is kept."
 
 prompt("Please enter your first name: ")
-stats[:player1_name] = gets.chomp
-keep_score = tournament_or_single?()
+stats[:player1][:name] = gets.chomp
 
-=begin
 prompt("(O)ne or (t)wo players? ")
 num_of_players = gets.chomp
-if num_of_players == 2
+if num_of_players == '2'
+  stats[:two_player] = true
   prompt("Enter second player first name: ")
-  second_name = gets.chomp
+  stats[:player2][:name] = gets.chomp
 end
-=end
+
+keep_score = tournament_or_single?()
 
 def who_goes_first?(stats)
   prompt("Choose who goes first : ")
@@ -272,7 +283,7 @@ until sayonara
   display_board(board)
 
   if check_win?(board, stats)
-    if detect_winner(board, stats) == stats[:player1_name]
+    if detect_winner(board, stats) == stats[:player1][:name]
       puts "#{detect_winner(board, stats)} won!"
       update_match(PLAYER_MARK, stats)
     else
@@ -284,13 +295,12 @@ until sayonara
     puts "It's a draw!"
   end
 
-  puts "#{stats[:player1_name]} wins: #{stats[:player_wins]} Computer wins: #{stats[:computer_wins]} Draws: #{stats[:draws]}"
+  puts "#{stats[:player1][:name]} wins: #{stats[:player_wins]} #{stats[:player2][:name]} wins: #{stats[:computer_wins]} Draws: #{stats[:draws]}"
 
   if keep_score
     if tournament_winner?(stats)
       display_tournament_winner(stats)
-      play_again?()
-      if answer != "yes"
+      if play_again?() != "yes"
         keep_score = false
         sayonara = true
       end
@@ -314,11 +324,3 @@ until sayonara
 end
 
 puts "Thank you for playing - Good bye."
-
-=begin
-player_move!(board, stats)
-break if game_over?(board, stats)
-display_board(board)
-computer_move!(board)
-display_board(board)
-=end
