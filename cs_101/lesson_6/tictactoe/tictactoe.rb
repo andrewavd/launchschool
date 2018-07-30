@@ -1,9 +1,12 @@
 # Tic Tac Toe
 require 'pry'
+require 'yaml'
 
+INTRO = YAML.load_file('tournament_ttt_intro.yml')
 PLAYER_MARK = 'X'
 COMPUTER_MARK = 'O'
 MATCH_WIN = 2
+GAME_TITLE = 'Tournament Tic Tac Toe'
 
 def initialize_match
   {
@@ -18,22 +21,46 @@ def initialize_match
   }
 end
 
+def title_underscore(repetitions)
+  repetitions.times { print"-" }
+  puts ""
+end
+
+def display_title(title)
+  puts ""
+  puts title.to_s
+  title_underscore(title.length)
+  puts ""
+end
+
+def validate_name(first_name, player_number)
+  if first_name == '' || first_name.strip.empty?
+    "#{player_number.capitalize}player"
+  else
+    first_name.strip.capitalize
+  end
+end
+
+def obtain_name(player_number)
+  prompt("Please enter #{player_number} player name: ")
+  validate_name(gets.chomp, player_number)
+end
+
 def prompt(message)
+  puts ""
   print "=> #{message}"
 end
 
 def display_board(brd)
   system 'clear'
-  puts "Tournament Tic Tac Toe"
-  puts "----------------------"
-  puts ""
+  display_title('Tournament Tic Tac Toe')
   puts "        |     |"
   puts "     #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
   puts "        |     |"
   puts "   -----+-----+-----"
-  puts "        |     |" 
+  puts "        |     |"
   puts "     #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
-  puts "        |     |" 
+  puts "        |     |"
   puts "   -----+-----+-----"
   puts "        |     |"
   puts "     #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
@@ -43,7 +70,7 @@ end
 
 def initialize_board
   new_board = {}
-  (1..9).each { |num| new_board[num] = "#{num}" }
+  (1..9).each { |num| new_board[num] = num.to_s }
   new_board
 end
 
@@ -84,12 +111,13 @@ def player_move!(brd, stats)
     valid_move = true
     puts "Square #{move} is the last move available..."
     puts "I'll fill it in for you."
-    sleep 3
+    sleep 2
   else
     valid_move = false
   end
   until valid_move
-    prompt("#{stats[:current_player]} choose a square (#{joinor(validate_move(brd))}): ")
+    prompt("#{stats[:current_player]} choose a square" \
+            " (#{joinor(validate_move(brd))}): ")
     move = gets.chomp.to_i
     if validate_move(brd).include?(move)
       valid_move = true
@@ -100,13 +128,13 @@ def player_move!(brd, stats)
   update_board(brd, move, stats)
 end
 
-def thinking()
+def thinking
   puts "Computer thinking..."
-  sleep 2
+  sleep 1
 end
 
 def computer_move!(brd, stats)
-  thinking()
+  thinking
 
   case stats[:skill_level]
   when 'novice'
@@ -114,8 +142,8 @@ def computer_move!(brd, stats)
     update_board(brd, move, stats)
   when 'skilled'
     winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-    [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-    [[1, 5, 9], [3, 5, 7]]
+                    [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                    [[1, 5, 9], [3, 5, 7]]
 
     move = 0
 
@@ -192,17 +220,17 @@ end
 
 def detect_winner(brd, stats)
   winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-         [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-         [[1, 5, 9], [3, 5, 7]]
+                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+                  [[1, 5, 9], [3, 5, 7]]
 
   winning_lines.each do |line|
     if brd[line[0]] == PLAYER_MARK &&
        brd[line[1]] == PLAYER_MARK &&
        brd[line[2]] == PLAYER_MARK
-       return stats[:player1][:name]
+      return stats[:player1][:name]
     elsif brd[line[0]] == COMPUTER_MARK &&
-      brd[line[1]] == COMPUTER_MARK &&
-      brd[line[2]] == COMPUTER_MARK
+          brd[line[1]] == COMPUTER_MARK &&
+          brd[line[2]] == COMPUTER_MARK
       return stats[:player2][:name]
     end
   end
@@ -210,14 +238,18 @@ def detect_winner(brd, stats)
 end
 
 def tournament_winner?(stats)
-  stats[:player1_wins] == MATCH_WIN || stats[:player2_wins] == MATCH_WIN || stats[:draws] == MATCH_WIN
+  stats[:player1_wins] == MATCH_WIN ||
+    stats[:player2_wins] == MATCH_WIN ||
+    stats[:draws] == MATCH_WIN
 end
 
 def display_tournament_winner(stats)
   if stats[:player1_wins] == MATCH_WIN
-    puts "#{stats[:player1][:name]} wins tournament #{stats[:player1_wins]} - #{stats[:player2_wins]}."
+    puts "#{stats[:player1][:name]} wins tournament" \
+          " #{stats[:player1_wins]} - #{stats[:player2_wins]}."
   elsif stats[:player2_wins] == MATCH_WIN
-    puts "#{stats[:player2][:name]} wins tournament #{stats[:player2_wins]} - #{stats[:player1_wins]}."
+    puts "#{stats[:player2][:name]} wins tournament" \
+          " #{stats[:player2_wins]} - #{stats[:player1_wins]}."
   else
     puts "The match has ended in a draw!"
   end
@@ -231,49 +263,68 @@ def game_over?(brd, stats)
   check_win?(brd, stats) || check_draw(brd)
 end
 
-def play_again?()
+def play_again?
   prompt "Would you like to play again (Y/n)? "
   answer = gets.chomp
   answer == "yes" ? true : false
 end
 
-def tournament_or_single?()
-  prompt("Choose (T)ournament or (S)ingle: ")
-  game_style = gets.chomp
-  game_style == "t" ? true : false
+def validate_first_player(stats)
+  if stats[:current_player] == stats[:player1][:name] || stats[:current_player] == stats[:player2][:name]
+    true
+  else
+    prompt("#{stats[:current_player]} ??? I'm not sure who that is. Please choose #{stats[:player1][:name]} or #{stats[:player2][:name]}: ")
+  end
 end
 
-stats = initialize_match()
+def validate_game_format(game_format)
+  if %w(t tournament s single).include?(game_format)
+    true
+  else
+    prompt("??? Please choose tournament or single: ")
+  end
+end
+
+def who_goes_first?(stats)
+  valid_input = false
+  prompt("Choose who goes first: (#{stats[:player1][:name]} or #{stats[:player2][:name]}) ")
+  until valid_input
+    stats[:current_player] = gets.chomp.capitalize
+    valid_input = validate_first_player(stats)
+  end
+end
+
+def tournament_or_single?
+  game_format = ''
+  valid_input = false
+  prompt("Choose format: (T)ournament or (S)ingle? ")
+  until valid_input
+    game_format = gets.chomp.downcase
+    valid_input = validate_game_format(game_format)
+  end
+  game_format.start_with?("t") ? true : false
+end
+
+stats = initialize_match
 sayonara = false
 
-puts
-puts "Welcome to Tournament Tic Tac Toe!"
+system 'clear'
+display_title("Welcome to #{GAME_TITLE}!")
+puts (INTRO['introduction'])
+stats[:player1][:name] = obtain_name('first')
 
-puts
-puts "Tournament Tic Tac Toe can be played as a single game or tournament."
-puts "Tournament style - First player to win 5 games wins the tournament."
-puts "Single Game - No score is kept."
-
-prompt("Please enter your first name: ")
-stats[:player1][:name] = gets.chomp
-
-prompt("(O)ne or (t)wo players? ")
+prompt("(1)ne or (2)wo players? ")
 num_of_players = gets.chomp
 if num_of_players == '2'
   stats[:two_player] = true
-  prompt("Enter second player first name: ")
-  stats[:player2][:name] = gets.chomp
+  stats[:player2][:name] = obtain_name('second')
 else
-  prompt('What skill level do you want the Computer to play at (novice, skilled or expert)? ')
+  prompt("What skill level do you want the Computer" \
+          " to play at (novice, skilled or expert)? ")
   stats[:skill_level] = gets.chomp
 end
 
-keep_score = tournament_or_single?()
-
-def who_goes_first?(stats)
-  prompt("Choose who goes first : ")
-  stats[:current_player] = gets.chomp
-end
+keep_score = tournament_or_single?
 
 who_goes_first?(stats)
 
@@ -294,19 +345,21 @@ until sayonara
       update_match(PLAYER_MARK, stats)
     else
       puts "#{detect_winner(board, stats)} won!"
-      update_match(COMPUTER_MARK, stats)     
+      update_match(COMPUTER_MARK, stats)
     end
   else
     update_match('D', stats)
     puts "It's a draw!"
   end
 
-  puts "#{stats[:player1][:name]} wins: #{stats[:player1_wins]} #{stats[:player2][:name]} wins: #{stats[:player2_wins]} Draws: #{stats[:draws]}"
+  puts "#{stats[:player1][:name]} wins: #{stats[:player1_wins]}" \
+        " #{stats[:player2][:name]} wins: #{stats[:player2_wins]}" \
+        " Draws: #{stats[:draws]}"
 
   if keep_score
     if tournament_winner?(stats)
       display_tournament_winner(stats)
-      if play_again?() != "yes"
+      if play_again? != "yes"
         keep_score = false
         sayonara = true
       end
@@ -319,14 +372,13 @@ until sayonara
       sayonara = true
     end
   else
-    if !play_again?()
+    if !play_again?
       sayonara = true
     else
-      keep_score = tournament_or_single?()
-    end   
+      keep_score = tournament_or_single?
+    end
   end
-
 
 end
 
-puts "Thank you for playing - Good bye."
+puts "Thank you for playing #{GAME_TITLE} - Good bye."
