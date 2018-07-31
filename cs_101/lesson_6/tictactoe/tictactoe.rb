@@ -3,21 +3,27 @@ require 'pry'
 require 'yaml'
 
 INTRO = YAML.load_file('tournament_ttt_intro.yml')
-PLAYER_MARK = 'X'
-COMPUTER_MARK = 'O'
+PLAYER1_MARK = 'X'
+PLAYER2_MARK = 'O'
 MATCH_WIN = 2
 GAME_TITLE = 'Tournament Tic Tac Toe'
 
 def initialize_match
   {
-    player1: { name: '', mark: PLAYER_MARK },
-    player2: { name: 'Computer', mark: COMPUTER_MARK },
+    player1: { name: '', mark: PLAYER1_MARK },
+    player2: { name: 'Computer', mark: PLAYER2_MARK },
     two_player: false,
     current_player: '',
+    skill_level: ''
+  }
+end
+
+def initialize_stats
+  {
+    game_winner: '',
     player1_wins: 0,
     player2_wins: 0,
-    draws: 0,
-    skill_level: ''
+    draws: 0
   }
 end
 
@@ -75,14 +81,14 @@ def initialize_board
 end
 
 def validate_move(brd)
-  brd.keys.select { |num| brd[num] != PLAYER_MARK && brd[num] != COMPUTER_MARK }
+  brd.keys.select { |num| brd[num] != PLAYER1_MARK && brd[num] != PLAYER2_MARK }
 end
 
-def update_board(brd, move, stats)
-  if stats[:current_player] == stats[:player1][:name]
-    brd[move] = stats[:player1][:mark]
+def update_board(brd, move, roster)
+  if roster[:current_player] == roster[:player1][:name]
+    brd[move] = roster[:player1][:mark]
   else
-    brd[move] = stats[:player2][:mark]
+    brd[move] = roster[:player2][:mark]
   end
 end
 
@@ -105,7 +111,7 @@ def joinor(arr, seperator = ', ', conjunction = "or")
   new_str
 end
 
-def player_move!(brd, stats)
+def player_move!(brd, roster)
   move = validate_move(brd)[0]
   if validate_move(brd).size == 1
     valid_move = true
@@ -116,7 +122,7 @@ def player_move!(brd, stats)
     valid_move = false
   end
   until valid_move
-    prompt("#{stats[:current_player]} choose a square" \
+    prompt("#{roster[:current_player]} choose a square" \
             " (#{joinor(validate_move(brd))}): ")
     move = gets.chomp.to_i
     if validate_move(brd).include?(move)
@@ -125,7 +131,7 @@ def player_move!(brd, stats)
       puts("That square is unavailable.")
     end
   end
-  update_board(brd, move, stats)
+  update_board(brd, move, roster)
 end
 
 def thinking
@@ -133,13 +139,13 @@ def thinking
   sleep 1
 end
 
-def computer_move!(brd, stats)
+def computer_move!(brd, roster)
   thinking
 
-  case stats[:skill_level]
+  case roster[:skill_level]
   when 'novice'
     move = validate_move(brd).sample
-    update_board(brd, move, stats)
+    update_board(brd, move, roster)
   when 'skilled'
     winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                     [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
@@ -152,11 +158,11 @@ def computer_move!(brd, stats)
       line.each do |sq|
         offense << brd[sq]
       end
-      if offense.count(COMPUTER_MARK) == 2
+      if offense.count(PLAYER2_MARK) == 2
         offense.each do |element|
-          if element != PLAYER_MARK && element != COMPUTER_MARK
+          if element != PLAYER1_MARK && element != PLAYER2_MARK
             move = brd[element.to_i].to_i
-            return update_board(brd, move, stats)
+            return update_board(brd, move, roster)
           end
         end
       end
@@ -167,40 +173,40 @@ def computer_move!(brd, stats)
       line.each do |sq|
         defense << brd[sq]
       end
-      if defense.count(PLAYER_MARK) == 2
+      if defense.count(PLAYER1_MARK) == 2
         defense.each do |element|
-          if element != PLAYER_MARK && element != COMPUTER_MARK
+          if element != PLAYER1_MARK && element != PLAYER2_MARK
             move = brd[element.to_i].to_i
-            return update_board(brd, move, stats)
+            return update_board(brd, move, roster)
           end
         end
       end
     end
 
-    if brd[5] != PLAYER_MARK && brd[5] != COMPUTER_MARK
+    if brd[5] != PLAYER1_MARK && brd[5] != PLAYER2_MARK
       move = brd[5].to_i
-      return update_board(brd, move, stats)
+      return update_board(brd, move, roster)
     end
 
     move = validate_move(brd).sample
-    update_board(brd, move, stats)
+    update_board(brd, move, roster)
   end
 end
 
-def make_move(brd, stats)
-  if stats[:two_player]
-    player_move!(brd, stats)
-    if stats[:current_player] == stats[:player1][:name]
-      stats[:current_player] = stats[:player2][:name]
+def make_move(brd, roster)
+  if roster[:two_player]
+    player_move!(brd, roster)
+    if roster[:current_player] == roster[:player1][:name]
+      roster[:current_player] = roster[:player2][:name]
     else
-      stats[:current_player] = stats[:player1][:name]
+      roster[:current_player] = roster[:player1][:name]
     end
-  elsif stats[:current_player] == stats[:player1][:name]
-    player_move!(brd, stats)
-    stats[:current_player] = stats[:player2][:name]
+  elsif roster[:current_player] == roster[:player1][:name]
+    player_move!(brd, roster)
+    roster[:current_player] = roster[:player2][:name]
   else
-    computer_move!(brd, stats)
-    stats[:current_player] = stats[:player1][:name]
+    computer_move!(brd, roster)
+    roster[:current_player] = roster[:player1][:name]
   end
 end
 
@@ -218,20 +224,24 @@ def check_draw(brd)
   validate_move(brd).empty?
 end
 
-def detect_winner(brd, stats)
+def detect_winner(brd, stats, roster)
   winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                   [[1, 5, 9], [3, 5, 7]]
 
   winning_lines.each do |line|
-    if brd[line[0]] == PLAYER_MARK &&
-       brd[line[1]] == PLAYER_MARK &&
-       brd[line[2]] == PLAYER_MARK
-      return stats[:player1][:name]
-    elsif brd[line[0]] == COMPUTER_MARK &&
-          brd[line[1]] == COMPUTER_MARK &&
-          brd[line[2]] == COMPUTER_MARK
-      return stats[:player2][:name]
+    if brd[line[0]] == PLAYER1_MARK &&
+       brd[line[1]] == PLAYER1_MARK &&
+       brd[line[2]] == PLAYER1_MARK
+      stats[:game_winner] = roster[:player1][:name]
+      update_match(PLAYER1_MARK, stats)
+      return roster[:player1][:name]
+    elsif brd[line[0]] == PLAYER2_MARK &&
+          brd[line[1]] == PLAYER2_MARK &&
+          brd[line[2]] == PLAYER2_MARK
+      update_match(PLAYER2_MARK, stats)
+      stats[:game_winner] = roster[:player2][:name]
+      return roster[:player2][:name]
     end
   end
   nil
@@ -243,24 +253,24 @@ def tournament_winner?(stats)
     stats[:draws] == MATCH_WIN
 end
 
-def display_tournament_winner(stats)
+def display_tournament_winner(stats, roster)
   if stats[:player1_wins] == MATCH_WIN
-    puts "#{stats[:player1][:name]} wins tournament" \
+    puts "#{roster[:player1][:name]} wins tournament" \
           " #{stats[:player1_wins]} - #{stats[:player2_wins]}."
   elsif stats[:player2_wins] == MATCH_WIN
-    puts "#{stats[:player2][:name]} wins tournament" \
+    puts "#{roster[:player2][:name]} wins tournament" \
           " #{stats[:player2_wins]} - #{stats[:player1_wins]}."
   else
     puts "The match has ended in a draw!"
   end
 end
 
-def check_win?(brd, stats)
-  !!detect_winner(brd, stats)
+def check_win?(brd, stats, roster)
+  !!detect_winner(brd, stats, roster)
 end
 
-def game_over?(brd, stats)
-  check_win?(brd, stats) || check_draw(brd)
+def game_over?(brd, stats, roster)
+  check_win?(brd, stats, roster) || check_draw(brd)
 end
 
 def play_again?
@@ -269,28 +279,31 @@ def play_again?
   answer == "yes" ? true : false
 end
 
-def validate_first_player(stats)
-  if stats[:current_player] == stats[:player1][:name] || stats[:current_player] == stats[:player2][:name]
+def validate_first_player(roster)
+  if roster[:current_player] == roster[:player1][:name] ||
+     roster[:current_player] == roster[:player2][:name]
     true
   else
-    prompt("#{stats[:current_player]} ??? I'm not sure who that is. Please choose #{stats[:player1][:name]} or #{stats[:player2][:name]}: ")
+    prompt("#{roster[:current_player]} ??? I'm not sure who that is. Please" \
+          "  choose #{roster[:player1][:name]} or #{roster[:player2][:name]}: ")
   end
 end
 
 def validate_game_format(game_format)
-  if %w(t tournament s single).include?(game_format)
+  if %w[t tournament s single].include?(game_format)
     true
   else
     prompt("??? Please choose tournament or single: ")
   end
 end
 
-def who_goes_first?(stats)
+def who_goes_first?(roster)
   valid_input = false
-  prompt("Choose who goes first: (#{stats[:player1][:name]} or #{stats[:player2][:name]}) ")
+  prompt("Choose who goes first: (#{roster[:player1][:name]}" \
+        " or #{roster[:player2][:name]}) ")
   until valid_input
-    stats[:current_player] = gets.chomp.capitalize
-    valid_input = validate_first_player(stats)
+    roster[:current_player] = gets.chomp.capitalize
+    valid_input = validate_first_player(roster)
   end
 end
 
@@ -305,65 +318,71 @@ def tournament_or_single?
   game_format.start_with?("t") ? true : false
 end
 
-stats = initialize_match
+roster = initialize_match
+stats = initialize_stats
 sayonara = false
+delay = true
 
 system 'clear'
 display_title("Welcome to #{GAME_TITLE}!")
-puts (INTRO['introduction'])
-stats[:player1][:name] = obtain_name('first')
+puts INTRO['introduction']
+roster[:player1][:name] = obtain_name('first')
 
 prompt("(1)ne or (2)wo players? ")
 num_of_players = gets.chomp
 if num_of_players == '2'
-  stats[:two_player] = true
-  stats[:player2][:name] = obtain_name('second')
+  roster[:two_player] = true
+  roster[:player2][:name] = obtain_name('second')
 else
   prompt("What skill level do you want the Computer" \
           " to play at (novice, skilled or expert)? ")
-  stats[:skill_level] = gets.chomp
+  roster[:skill_level] = gets.chomp
 end
 
 keep_score = tournament_or_single?
 
-who_goes_first?(stats)
+who_goes_first?(roster)
 
 until sayonara
   board = initialize_board
 
-  until game_over?(board, stats)
+  until game_over?(board, stats, roster)
     display_board(board)
-    make_move(board, stats)
-    break if game_over?(board, stats)
+    make_move(board, roster)
+    break if game_over?(board, stats, roster)
   end
 
   display_board(board)
 
-  if check_win?(board, stats)
-    if detect_winner(board, stats) == stats[:player1][:name]
-      puts "#{detect_winner(board, stats)} won!"
-      update_match(PLAYER_MARK, stats)
-    else
-      puts "#{detect_winner(board, stats)} won!"
-      update_match(COMPUTER_MARK, stats)
-    end
-  else
+  if check_draw(board)
     update_match('D', stats)
     puts "It's a draw!"
+  else
+    puts "#{stats[:game_winner]} won!"
   end
 
-  puts "#{stats[:player1][:name]} wins: #{stats[:player1_wins]}" \
-        " #{stats[:player2][:name]} wins: #{stats[:player2_wins]}" \
-        " Draws: #{stats[:draws]}"
-
   if keep_score
+    puts "#{roster[:player1][:name]} wins: #{stats[:player1_wins]}" \
+        " #{roster[:player2][:name]} wins: #{stats[:player2_wins]}" \
+        " Draws: #{stats[:draws]}"
     if tournament_winner?(stats)
-      display_tournament_winner(stats)
-      if play_again? != "yes"
-        keep_score = false
+      delay = false
+      display_tournament_winner(stats, roster)
+      if play_again?
+        keep_score = tournament_or_single?
+      else
         sayonara = true
       end
     end
+  else # not keeping score (single game)
+    if play_again?
+      delay = false
+      keep_score = tournament_or_single?
+    else
+      sayonara = true
+    end
+  end
+  if !sayonara && delay
     puts
     puts "Press <enter> to continue..."
     puts "or (q)uit to withdraw..."
@@ -371,14 +390,10 @@ until sayonara
     if answer == "q"
       sayonara = true
     end
-  else
-    if !play_again?
-      sayonara = true
-    else
-      keep_score = tournament_or_single?
-    end
   end
-
+  if !sayonara && tournament_winner?(stats)
+    stats = initialize_stats
+  end
 end
 
 puts "Thank you for playing #{GAME_TITLE} - Good bye."
