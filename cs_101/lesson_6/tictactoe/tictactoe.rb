@@ -52,8 +52,9 @@ def validate_first_player(roster)
      roster[:current_player][:name] == roster[:player2][:name]
     true
   else
-    prompt("#{roster[:current_player]} ??? I'm not sure who that is. Please" \
-          "  choose #{roster[:player1][:name]} or #{roster[:player2][:name]}: ")
+    prompt("#{roster[:current_player][:name]} ??? I'm not sure who that is. " \
+          "Please choose #{roster[:player1][:name]} " \
+          "or #{roster[:player2][:name]}: ")
   end
 end
 
@@ -72,64 +73,54 @@ def who_goes_first?(roster)
   end
 end
 
-def validate_skill_level(skill_level)
-  if %w[n novice s skilled].include?(skill_level)
+def validate_input(test_against, skill_level, msg)
+  if test_against.include?(skill_level)
     true
   else
-    prompt("??? Please enter (n)ovice or (s)killed: ")
+    prompt(msg)
   end
 end
 
 def obtain_skill_level
+  test_against = ['n', 'novice', 's', 'skilled']
+  msg = "??? Please enter (n)ovice or (s)killed: "
   skill_level = ''
   valid_input = false
   prompt("What skill level do you want the Computer" \
     " to play at: (n)ovice or (s)killed? ")
   until valid_input
     skill_level = gets.chomp.downcase
-    valid_input = validate_skill_level(skill_level)
+    valid_input = validate_input(test_against, skill_level, msg)
   end
   %w[n novice].include?(skill_level) ? 'novice' : 'skilled'
 end
 
-def validate_num_of_players(num_of_players)
-  if %w[1 o one 2 t two].include?(num_of_players)
-    true
-  else
-    prompt("??? Please choose 1) (o)ne or 2) (T)wo: ")
-  end
-end
-
 def obtain_num_of_players
+  test_against = ['1', 'o', 'one', 't', 'two']
+  msg = "??? Please choose 1) (o)ne or 2) (T)wo: "
   num_of_players = 'one'
   valid_input = false
   prompt("(o)ne or (t)wo players? ")
   until valid_input
     num_of_players = gets.chomp.downcase
-    valid_input = validate_num_of_players(num_of_players)
+    valid_input = validate_input(test_against, num_of_players, msg)
   end
   num_of_players
 end
 
 def two_players?
-  %w[2 t two].include?(obtain_num_of_players) ? true : false
-end
-
-def validate_game_format(game_format)
-  if %w[t tournament s single].include?(game_format)
-    true
-  else
-    prompt("??? Please choose tournament or single: ")
-  end
+  !!%w[2 t two].include?(obtain_num_of_players)
 end
 
 def tournament_or_single?
+  test_against = ['t', 'tournament', 's', 'single']
+  msg = "??? Please choose tournament or single: "
   game_format = ''
   valid_input = false
   prompt("Choose format: (T)ournament or (S)ingle? ")
   until valid_input
     game_format = gets.chomp.downcase
-    valid_input = validate_game_format(game_format)
+    valid_input = validate_input(test_against, game_format, msg)
   end
   game_format.start_with?("t") ? true : false
 end
