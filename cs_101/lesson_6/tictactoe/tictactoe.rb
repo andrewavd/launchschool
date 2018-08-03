@@ -74,11 +74,7 @@ def who_goes_first?(roster)
 end
 
 def validate_input(test_against, skill_level, msg)
-  if test_against.include?(skill_level)
-    true
-  else
-    prompt(msg)
-  end
+  test_against.include?(skill_level) ? true : prompt(msg)
 end
 
 def obtain_skill_level
