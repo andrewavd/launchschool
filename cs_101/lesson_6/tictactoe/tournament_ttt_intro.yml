@@ -1,0 +1,12 @@
+# Tournament Tic Tac Toe intro message
+
+introduction: |
+  - Tournament Tic Tac Toe can be played as a single game or tournament.
+  - 'Tournament' format...
+    * First player to win 5 games wins the tournament.
+    * If there are 5 draws before either player wins 5 games, the tournament ends in a draw.
+  - 'Single' game format...
+    * No score is kept.
+  - Choose one or two player format.
+  - Choose the skill level of the computer if single player format.
+  - Choose which player goes first.
