@@ -1,6 +1,11 @@
 # twenty-one
-require 'pry'
 
+HIT_OR_STAND = "Would you like to (h)it or (s)tand? "
+HIT_STAND_ERR = "??? Please enter (h)it or (s)tand: "
+MOVE_TEST = ['h', 'hit', 's', 'stand']
+PLAY_AGAIN = "Would you like to play again, (y)es or (n)o? "
+PLAY_AGAIN_ERR = "??? Please enter (y)es or (n)o: "
+YES_NO_TEST = ['y', 'yes', 'n', 'no']
 SUITS = ['C', 'D', 'H', 'S']
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
@@ -50,22 +55,26 @@ def display_hand(player)
   puts "Hand total: #{hand_total(player)}"
 end
 
+def yes_or_no?(move)
+  'yes' if %w[y yes].include?(move)
+end
+
 def hit_or_stand?(move)
   'hit' if %w[h hit].include?(move)
 end
 
-def validate_input(move)
-  %w[h hit s stand].include?(move)
+def validate_input(test_all, move)
+  test_all.include?(move)
 end
 
-def obtain_move
-  print "Would you like to (h)it or (s)tand? "
+def obtain_input?(test_all, input_msg, err_msg)
+  print input_msg
   move = gets.chomp.downcase
-  until validate_input(move)
-    puts "??? Please enter (h)it or (s)tand: "
+  until validate_input(test_all, move)
+    puts err_msg
     move = gets.chomp.downcase
   end
-  hit_or_stand?(move)
+  move
 end
 
 def deal_card(player, game_deck)
@@ -100,7 +109,7 @@ until game_over
   display_hand(player1)
 
   loop do
-    if obtain_move == 'hit'
+    if hit_or_stand?(obtain_input?(MOVE_TEST, HIT_OR_STAND, HIT_STAND_ERR)) == 'hit'
       deal_card(player1, game_deck)
       display_hand(player1)
       if busted?(hand_total(player1))
@@ -139,4 +148,12 @@ until game_over
     puts "Player total: #{hand_total(player1)}." \
     " Dealer total: #{hand_total(dealer)}."
   end
+
+  if yes_or_no?(obtain_input?(YES_NO_TEST, PLAY_AGAIN, PLAY_AGAIN_ERR)) == 'yes'
+    game_over = false
+  else
+    game_over = true
+  end
 end
+
+puts "Thank you for playing Twenty-One. Good bye."
