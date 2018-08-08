@@ -1,18 +1,22 @@
 # twenty-one
 
-HIT_OR_STAND = "Would you like to (h)it or (s)tand? "
+HIT_STAND = "Would you like to (h)it or (s)tand? "
 HIT_STAND_ERR = "??? Please enter (h)it or (s)tand: "
 MOVE_TEST = ['h', 'hit', 's', 'stand']
 PLAY_AGAIN = "Would you like to play again, (y)es or (n)o? "
+DEAL_AGAIN = "Deal again, (y)es or (n)o? "
 PLAY_AGAIN_ERR = "??? Please enter (y)es or (n)o: "
 YES_NO_TEST = ['y', 'yes', 'n', 'no']
 SUITS = ['C', 'D', 'H', 'S']
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+TARGET = 21
+HOLD = 17
+CREDITS = 5
 
 # outputs #
 
 def prompt(message)
-  print"=> #{message}"
+  print"\n=> #{message}"
 end
 
 def title_underscore(repetitions)
@@ -50,16 +54,16 @@ def hand_total(player)
   busted?(total) && ace ? total -= 10 : total
 end
 
-def display_hand(player)
+def display_hand(player, total)
   player.each { |hand| print "#{hand} " }
-  puts "Hand total: #{hand_total(player)}"
+  puts "Hand total: #{total}"
 end
 
-def yes_or_no?(move)
+def yes?(move)
   'yes' if %w[y yes].include?(move)
 end
 
-def hit_or_stand?(move)
+def hit?(move)
   'hit' if %w[h hit].include?(move)
 end
 
@@ -67,8 +71,8 @@ def validate_input(test_all, move)
   test_all.include?(move)
 end
 
-def obtain_input?(test_all, input_msg, err_msg)
-  print input_msg
+def obtain_input(test_all, input_msg, err_msg)
+  prompt(input_msg)
   move = gets.chomp.downcase
   until validate_input(test_all, move)
     puts err_msg
@@ -81,10 +85,25 @@ def deal_card(player, game_deck)
   player << game_deck.pop
 end
 
-def busted?(total)
-  total > 21
+def twentyone?(total)
+  total == TARGET
 end
 
+def busted?(total)
+  total > TARGET
+end
+
+def winner?(player, dealer)
+  if player > dealer
+    :player_wins
+  elsif dealer > player
+    :delaer_wins
+  else
+    :push
+  end
+end
+
+score = CREDITS
 game_over = false
 
 until game_over
@@ -93,44 +112,82 @@ until game_over
 
   output_title("Twenty-One!")
   game_deck = initialize_deck
-  # game_deck = [["A", "D"], ["K", "C"], ["6", "H"], ["A", "S"], ["Q", "S"]]
   player1 = []
   dealer = []
   hand_over = false
 
+  # initial deal
   2.times do
     player1 = deal_card(player1, game_deck)
     dealer = deal_card(dealer, game_deck)
   end
 
+  player1_total = hand_total(player1)
+  dealer_total = hand_total(dealer)
+
   output_title("Dealer's Hand")
   display_initial_dealer_hand(dealer)
   output_title("Player's Hand")
-  display_hand(player1)
+  display_hand(player1, player1_total)
 
-  loop do
-    if hit_or_stand?(obtain_input?(MOVE_TEST, HIT_OR_STAND, HIT_STAND_ERR)) == 'hit'
-      deal_card(player1, game_deck)
-      display_hand(player1)
-      if busted?(hand_total(player1))
-        output_title("Player busted...Dealer wins!")
-        hand_over = true
+  # Does anyone have 21 on initial deal?
+  if twentyone?(player1_total) || twentyone?(dealer_total)
+    case winner?(player1_total, dealer_total)
+    when :push
+      output_title("Dealer's Hand")
+      display_hand(dealer, dealer_total)
+      output_title("Player has 21! Dealer has 21! Hand is a push")
+    when :player_wins
+      output_title("Dealer's Hand")
+      display_hand(dealer, dealer_total)
+      output_title("21! Player wins!")
+      score += 1
+      puts "Player credits = #{score}."
+    when :delaer_wins
+      output_title("21! Dealer wins!")
+      puts "Dealer's Hand"
+      display_hand(dealer, dealer_total)
+      score -= 1
+      puts "\nPlayer credits = #{score}."
+    end
+    hand_over = true
+  end
+
+  # player's turn
+  if !hand_over
+    loop do
+      if hit?(obtain_input(MOVE_TEST, HIT_STAND, HIT_STAND_ERR)) == 'hit'
+        deal_card(player1, game_deck)
+        player1_total = hand_total(player1)
+        display_hand(player1, player1_total)
+      else
         break
       end
-    else
-      break
+      if twentyone?(player1_total) || busted?(player1_total)
+        hand_over = true
+      end
     end
   end
 
+  if busted?(player1_total)
+    output_title("Player busted...Dealer wins!")
+    score -= 1
+    puts "Player credits = #{score}."
+  end
+
+  # dealer's turn
   if !hand_over
     output_title("Dealer's Hand")
-    display_hand(dealer)
+    display_hand(dealer, dealer_total)
     loop do
-      break if hand_total(dealer) >= 17 && hand_total(dealer) <= 21
+      break if dealer_total >= HOLD && dealer_total <= TARGET
       deal_card(dealer, game_deck)
-      display_hand(dealer)
-      if busted?(hand_total(dealer))
+      dealer_total = hand_total(dealer)
+      display_hand(dealer, dealer_total)
+      if busted?(dealer_total)
         output_title(" Dealer busted...Player wins!")
+        score += 1
+        puts "Player credits = #{score}."
         hand_over = true
         break
       end
@@ -138,18 +195,28 @@ until game_over
   end
 
   if !hand_over
-    if hand_total(player1) > hand_total(dealer)
+    case winner?(player1_total, dealer_total)
+    when :player_wins
       output_title("Player wins!")
-    elsif hand_total(dealer) > hand_total(player1)
+      score += 1
+    when :delaer_wins
       output_title("Dealer wins!")
-    else
+      score -= 1
+    when :push
       output_title("Hand is a push!")
     end
-    puts "Player total: #{hand_total(player1)}." \
-    " Dealer total: #{hand_total(dealer)}."
+    puts "Player total: #{player1_total}." \
+    " Dealer total: #{dealer_total}."
+    puts "Player credits = #{score}."
   end
 
-  if yes_or_no?(obtain_input?(YES_NO_TEST, PLAY_AGAIN, PLAY_AGAIN_ERR)) == 'yes'
+  if score == 0
+    game_over = true
+    if yes?(obtain_input(YES_NO_TEST, PLAY_AGAIN, PLAY_AGAIN_ERR)) == 'yes'
+      game_over = false
+      score = CREDITS
+    end
+  elsif yes?(obtain_input(YES_NO_TEST, DEAL_AGAIN, PLAY_AGAIN_ERR)) == 'yes'
     game_over = false
   else
     game_over = true
