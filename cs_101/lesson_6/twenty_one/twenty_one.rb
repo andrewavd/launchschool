@@ -7,21 +7,19 @@ PLAY_AGAIN = "Would you like to play again, (y)es or (n)o? "
 DEAL_AGAIN = "Deal again, (y)es or (n)o? "
 PLAY_AGAIN_ERR = "??? Please enter (y)es or (n)o: "
 YES_NO_TEST = ['y', 'yes', 'n', 'no']
-SUITS = ['C', 'D', 'H', 'S']
-VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+SUITS = %w[C D H S]
+VALUES = %w[2 3 4 5 6 7 8 9 10 J Q K A]
 TARGET = 21
 HOLD = 17
 CREDITS = 5
 
 # outputs #
-
 def prompt(message)
   print"\n=> #{message}"
 end
 
 def title_underscore(repetitions)
-  repetitions.times { print'-' }
-  puts ""
+  puts("-" * repetitions)
 end
 
 def output_title(title)
@@ -34,33 +32,49 @@ def initialize_deck
 end
 
 def display_initial_dealer_hand(dealer)
-  puts " ?? #{dealer[1]} "
+  puts " ?? #{dealer[1][0]}#{dealer[1][1]}"
+end
+
+def twentyone?(total)
+  total == TARGET
+end
+
+def busted?(total)
+  total > TARGET
+end
+
+def hi_low_ace(hand, total)
+  if total > 10
+    hand[0].to_i + 1
+  else
+    hand[0].to_i + 11
+  end
 end
 
 def hand_total(player)
   total = 0
-  ace = false
+  hold_aces = false
   player.each do |hand|
     case hand[0]
     when 'J', 'Q', 'K'
       total += hand[0].to_i + 10
     when 'A'
-      ace = true
-      total += hand[0].to_i + 11
+      hold_aces = true
+      total += hi_low_ace(hand, total)
     else
       total += hand[0].to_i
     end
   end
-  busted?(total) && ace ? total -= 10 : total
+  busted?(total) && hold_aces ? total -= 10 : total
 end
 
 def display_hand(player, total)
-  player.each { |hand| print "#{hand} " }
+  player.each { |hand| print "#{hand[0]}#{hand[1]} " }
   puts "Hand total: #{total}"
 end
 
 def yes?(move)
-  'yes' if %w[y yes].include?(move)
+  %w[y yes].include?(move)
 end
 
 def hit?(move)
@@ -85,15 +99,7 @@ def deal_card(player, game_deck)
   player << game_deck.pop
 end
 
-def twentyone?(total)
-  total == TARGET
-end
-
-def busted?(total)
-  total > TARGET
-end
-
-def winner?(player, dealer)
+def determine_winner(player, dealer)
   if player > dealer
     :player_wins
   elsif dealer > player
@@ -104,12 +110,9 @@ def winner?(player, dealer)
 end
 
 score = CREDITS
-game_over = false
 
-until game_over
-
+loop do
   system 'clear'
-
   output_title("Twenty-One!")
   game_deck = initialize_deck
   player1 = []
@@ -132,7 +135,7 @@ until game_over
 
   # Does anyone have 21 on initial deal?
   if twentyone?(player1_total) || twentyone?(dealer_total)
-    case winner?(player1_total, dealer_total)
+    case determine_winner(player1_total, dealer_total)
     when :push
       output_title("Dealer's Hand")
       display_hand(dealer, dealer_total)
@@ -163,16 +166,15 @@ until game_over
       else
         break
       end
-      if twentyone?(player1_total) || busted?(player1_total)
+      break if twentyone?(player1_total)
+      if busted?(player1_total)
+        output_title("Player busted...Dealer wins!")
+        score -= 1
+        puts "Player credits = #{score}."
         hand_over = true
+        break
       end
     end
-  end
-
-  if busted?(player1_total)
-    output_title("Player busted...Dealer wins!")
-    score -= 1
-    puts "Player credits = #{score}."
   end
 
   # dealer's turn
@@ -185,7 +187,7 @@ until game_over
       dealer_total = hand_total(dealer)
       display_hand(dealer, dealer_total)
       if busted?(dealer_total)
-        output_title(" Dealer busted...Player wins!")
+        output_title("Dealer busted...Player wins!")
         score += 1
         puts "Player credits = #{score}."
         hand_over = true
@@ -195,7 +197,7 @@ until game_over
   end
 
   if !hand_over
-    case winner?(player1_total, dealer_total)
+    case determine_winner(player1_total, dealer_total)
     when :player_wins
       output_title("Player wins!")
       score += 1
@@ -211,15 +213,13 @@ until game_over
   end
 
   if score == 0
-    game_over = true
-    if yes?(obtain_input(YES_NO_TEST, PLAY_AGAIN, PLAY_AGAIN_ERR)) == 'yes'
-      game_over = false
+    if yes?(obtain_input(YES_NO_TEST, PLAY_AGAIN, PLAY_AGAIN_ERR))
       score = CREDITS
+    else
+      break
     end
-  elsif yes?(obtain_input(YES_NO_TEST, DEAL_AGAIN, PLAY_AGAIN_ERR)) == 'yes'
-    game_over = false
-  else
-    game_over = true
+  elsif !yes?(obtain_input(YES_NO_TEST, DEAL_AGAIN, PLAY_AGAIN_ERR))
+    break
   end
 end
 
