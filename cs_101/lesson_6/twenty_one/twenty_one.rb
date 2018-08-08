@@ -109,8 +109,7 @@ score = CREDITS
 loop do
   system 'clear'
   output_title("Twenty-One!")
-  # game_deck = initialize_deck
-  game_deck = [["2", "D"], ["A", "D"], ["5", "C"], ["4", "D"], ["K", "C"], ["A", "D"], ["A", "D"], ["9", "C"], ["A", "C"], ["A", "S"]]
+  game_deck = initialize_deck
   player1 = []
   dealer = []
   hand_over = false
