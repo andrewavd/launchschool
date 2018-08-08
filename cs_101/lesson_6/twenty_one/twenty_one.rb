@@ -43,29 +43,24 @@ def busted?(total)
   total > TARGET
 end
 
-def hi_low_ace(hand, total)
-  if total > 10
-    hand[0].to_i + 1
-  else
-    hand[0].to_i + 11
-  end
-end
-
 def hand_total(player)
   total = 0
-  hold_aces = false
+  ace_count = 0
   player.each do |hand|
     case hand[0]
     when 'J', 'Q', 'K'
       total += hand[0].to_i + 10
     when 'A'
-      hold_aces = true
-      total += hi_low_ace(hand, total)
+      ace_count += 1
+      total += hand[0].to_i + 11
     else
       total += hand[0].to_i
     end
   end
-  busted?(total) && hold_aces ? total -= 10 : total
+  ace_count.times do
+    total -= 10 if busted?(total)
+  end
+  total
 end
 
 def display_hand(player, total)
@@ -114,7 +109,8 @@ score = CREDITS
 loop do
   system 'clear'
   output_title("Twenty-One!")
-  game_deck = initialize_deck
+  # game_deck = initialize_deck
+  game_deck = [["2", "D"], ["A", "D"], ["5", "C"], ["4", "D"], ["K", "C"], ["A", "D"], ["A", "D"], ["9", "C"], ["A", "C"], ["A", "S"]]
   player1 = []
   dealer = []
   hand_over = false
