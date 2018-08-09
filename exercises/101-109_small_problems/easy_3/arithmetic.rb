@@ -27,8 +27,10 @@ puts "#{num1} * #{num2} = #{num1 * num2}"
 # original puts "#{num1} / #{num2} = #{num1 / num2}"
 if num2 == 0
   puts "Sorry... You can't divide by zero!"
+  puts "#{num1} / #{num2} = ERR"
+  puts "#{num1} % #{num2} = ERR"
 else
   puts "#{num1} / #{num2} = #{num1 / num2}"
+  puts "#{num1} % #{num2} = #{num1 % num2}"
 end
-puts "#{num1} % #{num2} = #{num1 % num2}"
 puts "#{num1} ** #{num2} = #{num1 ** num2}"
