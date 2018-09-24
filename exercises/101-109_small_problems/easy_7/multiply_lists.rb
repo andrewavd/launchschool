@@ -4,7 +4,7 @@
 # same number of elements.
 
 def multiply_list(arr1, arr2)
-  result = arr1.map.with_index { |e, i| e * arr2[i] }
+  arr1.map.with_index { |e, i| e * arr2[i] }
 end
 
 p multiply_list([3, 5, 7], [9, 10, 11]) # == [27, 50, 77]
