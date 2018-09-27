@@ -7,14 +7,15 @@ def rotate_array_original(arr)
   results.push(results.shift)
 end
 
-def rotate_array(arr)
+def rotate_array_my_solution(arr)
   results = arr.clone
-  #results.push(results.shift)
   results << results.shift
 end
 
-def rotate_array_solution(arr)
-  arr[1..-1] + arr[0]
+def rotate_array(arr)
+  # arr[1..-1] returns an array. arr[0] returns the element at index 0.
+  # so arr[0] must be bracketed so it returns an array contining element 0.
+  arr[1..-1] + [arr[0]]
 end
 
 def rotate_string(str)
