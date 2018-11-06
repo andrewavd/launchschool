@@ -1,5 +1,6 @@
 # isograms.rb
 # November 5, 2018
+# 7 kyu
 
 # Problem:
 # An isogram is a word that has no repeating letters, consecutive or non-consecutive. Implement a
