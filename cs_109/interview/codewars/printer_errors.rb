@@ -1,7 +1,7 @@
 # printer_errors.rb
 # November 8, 2018
 # 7kyu
-# Completion time: 0:00
+# Completion time: 11:53
 
 # Problem:
 # In a factory a printer prints labels for boxes. For one kind of boxes the printer has to use colors
