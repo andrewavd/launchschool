@@ -1,7 +1,7 @@
 # bouncing_balls.rb
 # November 10, 2018
 # 6kyu
-# Completion time: 0:00
+# Completion time: 17:26
 
 # Problem:
 # A child is playing with a ball on the nth floor of a tall building. The height of this floor, h, is
