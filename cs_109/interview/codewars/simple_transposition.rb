@@ -1,7 +1,7 @@
 # simple_transposition.rb
 # November 10, 2018
 # 6kyu
-# Completion time: 0:00
+# Completion time: 13.29
 
 # Problem:
 # Simple transposition is a basic and simple cryptography technique. We make 2 rows and put first a
