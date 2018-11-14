@@ -1,0 +1,4 @@
+The sub_adjective brown sub_noun sub_adverb
+sub_verb the sub_adjective yellow
+sub_noun, who sub_adverb sub_verb his
+sub_noun and looks sub_adjective.

@@ -40,8 +40,13 @@ matrix = [
 ]
 
 def transpose(matrix)
-  new_matrix = [[], [], []]
-  matrix.each { |arr| arr.each_with_index { |e, i| new_matrix[i] << e } }
+  new_matrix = []
+  matrix.each_with_index do |arr, idx|
+    new_matrix << []
+    arr.each_with_index do |e, i|
+      new_matrix[i][idx] << e
+    end
+  end
   new_matrix
 end
 
