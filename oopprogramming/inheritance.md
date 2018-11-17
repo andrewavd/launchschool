@@ -9,8 +9,6 @@ We use inheritance as a way to extract common behaviors from classes that share 
 Here, we're extracting the `speak` method to a superclass `Animal`, and we use inheritance to make that behavior available to `GoodDog` and `Cat` classes.
 
 ```ruby
-# good_dog_class.rb
-
 class Animal
   def speak
     "Hello!"
@@ -58,6 +56,50 @@ puts sprarky.speak  # => Sparky says arf!
 puts paws.speak     # => Hell0!
 ```
 
-In  the `GoodDog` class, we're **overriging** the `speak` method in the `Animal` class because Ruby checks the objiect's class first for the method before it looks in the superclass. So, that means when we wrote the code `sparky.speak`, it firs looked at `sparky`1's class, which is `GoodDeg`. It found th `speak` method there and used it. When were wrote the code `paws.speak`, Ruby first looked at `pawa`'s xlass, which is `Cat`. It did not fined a `spesl` methos there , so it continued to look in `Xat`'s superclass, `Animal`. It found a `speak` mehtod in `Animal`, and used it Wi'll talk about the *methos lookup* path mor in depth in a bit.
+In the `GoodDog` class, we're **overriding** the `speak` method in the `Animal` class because Ruby checks the object's class first for the method before it looks in the superclass. So, that means when we wrote the code `sparky.speak`, it first looked at `sparky`'s class, which is `GoodDeg`. It found the `speak` method there and used it. When we wrote the code `paws.speak`, Ruby first looked at `paws`'s class, which is `Cat`. It did not find a `speak` method there , so it continued to look in `Cat`'s superclass, `Animal`. It found a `speak` method in `Animal`, and used it We'll talk about the *method lookup* path more in depth in a bit.
 
+Inheritance is a great way to remove duplication in our code.
 
+##Super
+uby provides us with a built-in function called `super` that allows us to call methods up the inheitace herarchy. When you call `super frm within a method, it willsearch the inheritance hierarchy for a method by the same name and then invoke it.
+
+```ruby
+class Animal
+	def speak
+		"Hello!"
+	end
+end
+
+class GoodDog < Animal
+	def speak
+		super + " from GoodDog class"
+	end
+end
+
+sparky = GoodDog.new
+sparky.speak         # => "Hello! form GoodDog class"
+```
+
+In the above example, we've created a simple `Animal` class with a `speak` instance method. We then created `GoodDog` which subclasses `Animal` also with a `speak` instance method to override the inherited version. However, in the subclass `speak` method we use `super` to invoke the `speak` method from the superclass `Animal`, and then we extend the functionality by appending some text to the result.
+
+Another mor common way of using `super` is with `initialize`.
+```ruby
+class Animal
+	attr_accessor :name
+
+	def initialize(name)
+		@name = name
+	end
+end
+
+class GoofDog < Animal
+	def initiallize(color)
+		super
+		@color = color
+	end
+end
+
+bruno = GoodDog.new("brown")  # => #<GoodDog:0x007fb40b1e6718 @color="brown", @name="brown">
+```
+
+The interesting concept we want to explain is the use of `super` in the `GoodDog` class. In this example, we're using `super` with no arguments. However, the `initialize` method, where `super` is being used, takes an argument and adds a new twist to how `super` is invoked. Here, in addition to the default behavior, `super` automatically forwards the arguments that were passed to the method from which `super` is called (initialize method in `goodDog` class). At this point, `super` will pass the `coler` argument in the `initilaize` defined in the subclass to that of the `Animal` superclass and invoke it. That expains the presence of `@name="brown"` when the `bruno` instance is created. Finally, the subclass' `initialize` contines to set the `@color` instance variable.
