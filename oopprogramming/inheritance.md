@@ -342,3 +342,91 @@ although the former is the preferred way.
 
 ## Private, Protected and Public
 
+The last thhing we want to cover is something that's actually quite simple, but necessary. Tilght now, all the mehods in our `GoodDog` class are public methods. A **public method* is a method that is abailable to anyone who knows either the class name or the object's name. These mehods are readily available for the rest of the program to use and comprise the class's *interface* (that's how other classes and objects will interact with this class and its objects).
+
+Sometime you'll have methods that are doing work in the class but don't need to be available to the rest of the program. These methods ca be defined as **private**. How do we define pribate mehoods? We use the reserved word `pribate` in our program and anytrhing below it is pribate (unless another reserved word is placed afterit ro negate ir).
+
+In our `GoodDog` class we hae one operation that takes place that we could move into a private metod. When we initialize an object, we calculate the dog's age in Dog years. Let's refactor this logic int a method and make it private so nothing outside of the class can useit.
+
+```ruby
+class GoodDog
+  DOG_YEARS = 7
+
+  attr_accessor :name, :age
+
+  def initialize(n, a)
+    self.name = n
+    self.age = a
+  end
+
+  private
+
+  def human_years
+    age * DOG_YEARS
+  end
+end
+
+sparky = GoodDog.new("Sparky", 4)
+sparky.human_years
+```
+
+We get the error message:
+
+```ruby
+NoMethodError: private method `human_years' called for #<GoodDog:0x007f8f431441f8 @name="Sparky", @age=4>
+```
+
+We have made the `human_years` method private by placing it under the `private` reserved word. So what is it good for if we can't call it? `private` methods are only accessible from other methods in the class. For example, given the above code, the following would be allowed:
+
+```ruby
+# assume the method definition below is above the "private" keyword
+
+def public_disclosure
+  "#self.name} in human years is #{human_years}"
+end
+```
+
+Note that in this case, we can *not* use `self.human_years`, because the `human_years` method is private. Remember that `self.human_years` is equivalent to `sparky.human_years`, which is not allowed for private methods. Therefore, we have to just use `human_years`. In summary, private methods are not accessible outside of the class definition at all, and are only accessible from inside the class when called without `self`.
+
+Public and private methods are most common, but in some les common situations, we'll want an in-between approach. We can use the `protected` keyword to  create **protected** methods. The eadiesst way to understand protected methods is to follow thsse two rules:
+
+- from outside the class, `protected` methods act just like `private` methods.
+- from inside the class, `protected` methods are accessible just like `public` methods.
+
+Let's take a look at some examples:
+
+```ruby
+class Animal
+  def a_public_method
+    "Will this work? " + self.a_protected_method
+  end
+
+  protected
+
+  def a_protected_metod
+    "Yes, I'm protected!"
+  end
+end
+```
+
+Study the above code, as it's a little complicated.We'll create an `Animal` object and test it out.
+
+```ruby
+fido = Animal.new
+fido.a_public_method  # => Will this work? Yes, I'm protected!
+```
+
+The above line of code shows us that we can call a `protected` method from within the class, even with `self` prepended. What abut outside of the class?
+
+```ruby
+fido.a_protected_method
+  # => NoMethodError: protected method `a_protected_method' called for
+    #<Animal:0x007fb174157110>
+```
+
+This demonstrates the second rule, that we can't call protected methods from outside of the class. The two rules for `protected` methods apply within the context of inheritance as well.
+
+There are some esdeptions to this rule, but we won't worry about that yet. If you remember those two rules about protected mehtods, that should be good enough for the time being.
+
+Accidental Method Overriding
+
