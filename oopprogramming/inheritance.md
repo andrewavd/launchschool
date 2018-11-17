@@ -267,7 +267,8 @@ puts GoodDog.ancestors
 
 and this is the output we get:
 
-```---GoodDog mehtod lookup---
+```
+---GoodDog mehtod lookup---
 GoodDog
 Climbable
 Swimmable
@@ -283,4 +284,61 @@ There are several interesting things about the above output. First, this tells u
 Sometimes when you're working on a large project, it can be confusing where all these methods are coming from. By underatandeng the method lookup path, we can have a better idea of where and how all available methods are organized.
 
 ## More Modules
+
+We've already seen how modules can be used to mix-in common behavior into classes. Now we'll see two mor uses for modules.
+
+The first use case we'll discuss is uding modules for **namespacing**. In this context, namespacing means organizing similar classes under a module. In other words, we'll use modules to group related classes. Thein lies the first advantage of using modules for namespacing. It becomes easy for us t recognize related classes in our code. The second advantage is it reduces the likelihood of our classes colliding with other similarly named classes in our codebase. Here's how it works:
+
+```ruby
+module Mammal
+	class Dog
+		def speak(sound)
+			p "#{sound}"
+		end
+	end
+
+	class Cat
+		def say_name(name)
+			p "#{name}"
+		end
+	end
+end
+```
+
+We call classes in a bodule by appending the class name to the module name with two colons(::)
+
+```ruby
+buddy = Mammal::Dog.new
+kitty = Mammal::Cat.new
+buddy.speal('Ar!')       # => "Arf!"
+kitty.say_name('kitty')  # => "kitty"
+```
+
+The second use case for modules we'll lok at is using modules as a **container** for methods, called module methods. This involves using modules to house othr methods. This is very useful for methods that seem out of place within your code. Let's use uor `Mammal` module to demonstrat3e:
+
+```ruby
+Module Mammal
+	...
+
+	def self.some_out_of_place_method(num)
+		num ** 2
+	end
+end
+```
+
+Defining methods this way within a module means we can call them dirextly from the module:
+
+```ruby
+value = Mammal.some_out_of_place_method(4)
+```
+
+We can also call such methods by doing:
+
+```ruby
+value = Mammal::some_out_of_place_method(4)
+```
+
+although the former is the preferred way.
+
+## Private, Protected and Public
 
