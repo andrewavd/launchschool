@@ -125,14 +125,5 @@ Another way to DRY up your code in Ruby is to use *modules*. We've already seen 
 
 Extracting common methods to a superclass, like we did in the privious section, is a great way to model concepts that are naturally hierarchiacal. We gave the example of animals. We have a generic superclass called `Animal` tha can keep all basic behavior of all animals. We can then expand on the model a little and have, perhaps, a `Mammal` subclass of `Animal`. We can imagine the entire class hierarchy to look something like the figure below.
 
-ANIMAL
-
-|					|
-
-FISH			MAMMAL
-
-					|			|
-					
-					CAT		DOG
-
+![image](https://d2aw5xe2jldque.cloudfront.net/books/ruby/images/animal_hierarchy.jpg)
 
