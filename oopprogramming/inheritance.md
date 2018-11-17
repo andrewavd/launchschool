@@ -61,7 +61,7 @@ In the `GoodDog` class, we're **overriding** the `speak` method in the `Animal` 
 Inheritance is a great way to remove duplication in our code.
 
 ## Super
-uby provides us with a built-in function called `super` that allows us to call methods up the inheitace herarchy. When you call `super frm within a method, it willsearch the inheritance hierarchy for a method by the same name and then invoke it.
+Ruby provides us with a built-in function called `super` that allows us to call methods up the inheitace herarchy. When you call `super from within a method, it willsearch the inheritance hierarchy for a method by the same name and then invoke it.
 
 ```ruby
 class Animal
@@ -120,4 +120,15 @@ BadDog.new(2, "bear")  # => #<BadDog:0x007fb40b2beb68 @age=2, @name="bear">
 This is similar to our previous example, with the difference being that `super` takes an argument, hence the passed in argument is sent to the superclass. Consequently, in this example when a	`BadDog` class is created the passed in `name` argument ("bear") is passed to the superclass and set to the `@name` instance variable.
 
 ## Mixing in Modules
+
+Another way to DRY up your code in Ruby is to use *modules*. We've already seen a little bit of how to use modules, but we'll give a few mor examples here.
+
+Extracting common methods to a superclass, like we did in the privious section, is a great way to model concepts that are naturally hierarchiacal. We gave the example of animals. We have a generic superclass called `Animal` tha can keep all basic behavior of all animals. We can then expand on the model a little and have, perhaps, a `Mammal` subclass of `Animal`. We can imagine the entire class hierarchy to look something like the figure below.
+
+ANIMAL
+|					|
+FISH			MAMMAL
+					|			|
+					CAT		DOG
+
 
