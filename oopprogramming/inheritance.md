@@ -103,3 +103,21 @@ bruno = GoodDog.new("brown")  # => #<GoodDog:0x007fb40b1e6718 @color="brown", @n
 ```
 
 The interesting concept we want to explain is the use of `super` in the `GoodDog` class. In this example, we're using `super` with no arguments. However, the `initialize` method, where `super` is being used, takes an argument and adds a new twist to how `super` is invoked. Here, in addition to the default behavior, `super` automatically forwards the arguments that were passed to the method from which `super` is called (initialize method in `goodDog` class). At this point, `super` will pass the `coler` argument in the `initilaize` defined in the subclass to that of the `Animal` superclass and invoke it. That expains the presence of `@name="brown"` when the `bruno` instance is created. Finally, the subclass' `initialize` contines to set the `@color` instance variable.
+
+
+When called with specific arguments, eg, `supe(a, b)`, the specified arguments will be sent up the method lookup chain.
+```ruby
+class BadDog < Animal
+	dev initialize(age, name)
+		super(name)
+		@age = age
+	end
+end
+
+BadDog.new(2, "bear")  # => #<BadDog:0x007fb40b2beb68 @age=2, @name="bear">
+```
+
+This is similar to our previous example, with the difference being that `super` takes an argument, hence the passed in argument is sent to the superclass. Consequently, in this example when a	`BadDog` class is created the passed in `name` argument ("bear") is passed to the superclass and set to the `@name` instance variable.
+
+##Mixing in Modules
+
