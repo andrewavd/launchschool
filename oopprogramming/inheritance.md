@@ -428,5 +428,94 @@ This demonstrates the second rule, that we can't call protected methods from out
 
 There are some esdeptions to this rule, but we won't worry about that yet. If you remember those two rules about protected mehtods, that should be good enough for the time being.
 
-Accidental Method Overriding
+## Accidental Method Overriding
 
+It is important to remember that every class you create inherently subclasses from **class Object**. The `Object` class is built into Ruby and comes with many critical methods.
+
+```ruby
+class Parent
+  def say_hi
+    p "Hi from Parent."
+  end
+end
+
+Parent.superclass  # => Object
+```
+
+This means that methods defined in the `Object` class are available in *all classes*.
+
+Further, recall that through the magic of inheritance, a subclass can override a supeclass's method.
+
+```ruby
+class Child < Parent
+  def say_hi
+    p "Hi from Child."
+  end
+end
+
+child = Child.new
+child.say_hi   # => "Hi from Child."
+```
+
+This means that, if you accidentally override a method that was originally defined in the `Object` class, it can have far-reaching effects on your code. For example, `send` is an instance method that all classes inherit from `dObject`. If you define a new `send` instance method in your class, all objects of you class will call your custom `send` method, instead of the one in class `Object`, which is probably the one they mean to call. Object `send` serves as a way to call a method by passing it a symbol or a string which represents the method you want to call. The next couple of arguments will represent the method's arguments, if any. Let's see how `send` normally works by making use of our  `Child` class:
+
+```ruby
+son.Child.new
+son.send :say_hi   # => "Hi from Child."
+```
+
+Let's see what happens when we define a `send` method in our `Child` class ans then try ti invole `Object`'s `send` method:
+
+```ruby
+class Child
+  def say_hi
+    p "Hi from Child/"
+  end
+
+  def send
+    p "send from Child..."
+  end
+end
+
+lad = Child.new
+lad.send :say_hi
+```
+
+Normally we would wxpect the output of this call to be `"Hi from Child." but uupon running the code we get a completely differednt result:
+
+```ruby
+ArgumentError: worn number of arguments (1 for 0)
+from (pry:12:in 'send'
+```
+
+In our example , we're passing `send` one argument even though our overridden `send` method does not take any arguments. Let's take a look at another example by exploring Object's `instance_of?` method. What this handy method does is to return `true` if an object is an instance of a given class and `false` otherwise. Let's see it in action:
+
+```ruby
+c = Child.new
+c.instance_of? Child  # => true
+c.instance_of> Parent # => false
+```
+
+Now let's override `instance_of?` within `Child`:
+
+```ruby
+class Child
+  # other methods omitted
+
+  def instance_of?
+    p "I an a fake instance"
+  end
+end
+
+heir = Child.new
+heir.instance_of? Child
+```
+
+Again, we'll see something completely different though or intention was to use Object's `instance_of?` method:
+
+```ruby
+ArgumentError: wrong number of arguments (1 for 0)
+from (pry):22:in 'instance_of?'
+```
+
+That said, one `Object` instance method that's easily overridden without any major side-effect is `to_s` method. You'll normally want to do this when you want a different string representation of an object. Overall, it's imprtant to familiarize yourself with some of the common `Object` methods and make sure to not accidentally override them as this can have devastating consequences for your appllication.
