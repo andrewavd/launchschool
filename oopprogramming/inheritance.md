@@ -173,3 +173,13 @@ Using modules to group common behaviors allows us to byuild a mor poweful, flexi
 
 ## Inheritance vs Modules
 
+Now that you know the two primary way that Ruby implements inheritance, class inheritance and mixing in modules, you may wonder when to use one vs the other. Here ate a couple of things to remember when evaluating those two choices.
+
+- You can only subclass from one class, but you can min in as many modules as you'd like.
+- if it's an "is-a" relationship, choose class ingeritance. If it's a "has-a" relationship, choose modules. Exammple: a dog "is an" animal; a dog "has an" ability to seim.
+- You cannot instantiate modules (i.e., no object can be created from a module). Modules are used only for namespacing and grouping common methods together.
+
+As you get better at OO design, you'll start to develop a feel for when to use class ingeritance versus mixing in modules.
+
+## Method Lookup Pth
+
