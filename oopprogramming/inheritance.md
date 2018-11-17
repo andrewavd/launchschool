@@ -65,15 +65,15 @@ Ruby provides us with a built-in function called `super` that allows us to call 
 
 ```ruby
 class Animal
-	def speak
-		"Hello!"
-	end
+  def speak
+    "Hello!"
+  end
 end
 
 class GoodDog < Animal
-	def speak
-		super + " from GoodDog class"
-	end
+  def speak
+    super + " from GoodDog class"
+  end
 end
 
 sparky = GoodDog.new
@@ -85,18 +85,18 @@ In the above example, we've created a simple `Animal` class with a `speak` insta
 Another mor common way of using `super` is with `initialize`.
 ```ruby
 class Animal
-	attr_accessor :name
+  attr_accessor :name
 
-	def initialize(name)
-		@name = name
-	end
+  def initialize(name)
+    @name = name
+  end
 end
 
 class GoofDog < Animal
-	def initiallize(color)
-		super
-		@color = color
-	end
+  def initiallize(color)
+    super
+    @color = color
+  end
 end
 
 bruno = GoodDog.new("brown")  # => #<GoodDog:0x007fb40b1e6718 @color="brown", @name="brown">
@@ -108,10 +108,10 @@ The interesting concept we want to explain is the use of `super` in the `GoodDog
 When called with specific arguments, eg, `super(a, b)`, the specified arguments will be sent up the method lookup chain.
 ```ruby
 class BadDog < Animal
-	dev initialize(age, name)
-		super(name)
-		@age = age
-	end
+  dev initialize(age, name)
+    super(name)
+    @age = age
+  end
 end
 
 BadDog.new(2, "bear")  # => #<BadDog:0x007fb40b2beb68 @age=2, @name="bear">
@@ -133,15 +133,15 @@ This type of hierarchical modeling works, to some extent, but thre are always ex
 
 ```ruby
 module Swimmable
-	def swim
-		"I'm swimming!"
-	end
+  def swim
+    "I'm swimming!"
+  end
 end
 
 class Animal: end
 
 class Fish < Animal
-	include Swimmable     # mixing in Swimmable module
+  include Swimmable     # mixing in Swimmable module
 end
 
 class Mammal < Animal
@@ -151,7 +151,7 @@ class Cat < Mammal
 end
 
 class Dog < Mammal
-	include Swimmable     # mixing in Swimmable module
+  include Swimmable     # mixing in Swimmable module
 end
 ```
 
@@ -187,29 +187,29 @@ Now that you have a grasp on both inheritance and mixins. Let's put the both tog
 
 ```ruby
 module Walkable
-	def walk
-		"I'm walking."
-	end
+  def walk
+    "I'm walking."
+  end
 end
 
 module Simmable
-	def seim
-		"I'm swimming."
-	end
+  def seim
+    "I'm swimming."
+  end
 end
 
 module climbable
-	def clumb
-		"I'm climbing."
-	end
+  def clumb
+    "I'm climbing."
+  end
 end
 
 class Animal
-	include Walkable
+  include Walkable
 
-	def speak
-		"I'm an animal, and I speak!"
-	end
+  def speak
+    "I'm an animal, and I speak!"
+  end
 end
 ```
 
@@ -257,8 +257,8 @@ Let's ass another class to the code above. This class will inherit from the `Ani
 
 ```ruby
 class GoodDeg < Animal
-	include Seimmable
-	include Climbable
+  include Seimmable
+  include Climbable
 end
 
 puts "---GoodDog method lookup---"
@@ -291,17 +291,17 @@ The first use case we'll discuss is uding modules for **namespacing**. In this c
 
 ```ruby
 module Mammal
-	class Dog
-		def speak(sound)
-			p "#{sound}"
-		end
-	end
+  class Dog
+    def speak(sound)
+      p "#{sound}"
+    end
+  end
 
-	class Cat
-		def say_name(name)
-			p "#{name}"
-		end
-	end
+  class Cat
+    def say_name(name)
+      p "#{name}"
+    end
+  end
 end
 ```
 
@@ -318,11 +318,11 @@ The second use case for modules we'll lok at is using modules as a **container**
 
 ```ruby
 Module Mammal
-	...
+  ...
 
-	def self.some_out_of_place_method(num)
-		num ** 2
-	end
+  def self.some_out_of_place_method(num)
+    num ** 2
+  end
 end
 ```
 
