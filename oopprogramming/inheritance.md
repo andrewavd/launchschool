@@ -127,3 +127,49 @@ Extracting common methods to a superclass, like we did in the privious section, 
 
 ![image](https://d2aw5xe2jldque.cloudfront.net/books/ruby/images/animal_hierarchy.jpg)
 
+The above diagram shows what pure class baded inheritance looks like. Remember the goal of this is to put the right behavior (i.e., methods) in the right class so we don't need to repeat code in multiple classes. We can imagine that all 1Fish1 objects are related to animals that lilve in the water, so perhaps a 1swim1 method should be in the 1Fish1 class. We can laso imagine that all 1mammal1 objects will have warm blood, so we can create a method caled `qarm_bloded?` in the `Mammal` class and have it return `true`. There fore, the `Cat` and `Dog` objects will have access to the `war_bloded?` method which is automatically inherited from `Mamma` by the `Cat` and `Dog` classes. but they won't have access to the methods in the `Fish` class.
+
+This type of hierarchical modeling works, to some extent, but thre are always exceptions. For example, we put the `swim` method in the `Fish` class, but some mammals can swim as well. We don't want to move the 	swim` method into `Animal` because not all animals swim, and we don't want to create another `swim` method in `Dog` because that violated the DRY principle. For concerns such as these, we'd like to group them into a module and then *mix* in that module to the classes that require those behaviors.
+
+```ruby
+module Swimmable
+	def swim
+		"I'm swimming!"
+	end
+end
+
+class Animal: end
+
+class Fish < Animal
+	include Swimmable     # mixing in Swimmable module
+end
+
+class Mammal < Animal
+end
+
+class Cat < Mammal
+end
+
+class Dog < Mammal
+	include Swimmable     # mixing in Swimmable module
+end
+```
+
+Now `Fish` and `Dog` objects can swim, but objects of other classes won't be able to:
+
+```ruby
+sparky = Dog.new
+neemo =  Fish.new
+paws = Cat.new
+
+sparky.swim   # => I'm swimming!
+neemo.swim    # => I'm swimming!
+paws.swim     # => NoMethodError: undefined method 'swim' for #<Cat:0x007fc453152308>
+```
+
+Using modules to group common behaviors allows us to byuild a mor poweful, flexible and DRY design.
+
+*Note: A common naming convention for Ruby is to use the "able" suffix on whatever ver describes the behavior that the module is modeling. You can see this convetion wit our `Swimmable` module. Likewise, we could name a module that descrebes "walking" a `walkable`. Not all modules are named in this manner, however, it is quite common.*
+
+## Inheritance vs Modules
+
