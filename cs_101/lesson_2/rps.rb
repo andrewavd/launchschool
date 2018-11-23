@@ -4,16 +4,6 @@ def prompt(message)
   print("=> #{message}")
 end
 
-def convert_player_input(player_input)
-  if player_input.start_with?('r')
-    'Rock'
-  elsif player_input.start_with?('p')
-    'Paper'
-  else
-    'Scissors'
-  end
-end
-
 def validate_player_input(player_input)
   if %w(r rock p paper s scissors).include?(player_input)
     true
@@ -30,6 +20,16 @@ def obtain_player_input
     valid_input = validate_player_input(player_input)
   end
   player_input
+end
+
+def convert_player_input(player_input)
+  if player_input.start_with?('r')
+    'Rock'
+  elsif player_input.start_with?('p')
+    'Paper'
+  else
+    'Scissors'
+  end
 end
 
 def obtain_computer_input
