@@ -76,8 +76,8 @@ class Player
 
   def initialize
     set_name
-    # @moves_count = {Rock: 0, Paper: 0, Scissors: 0, Lizard: 0, Spock: 0}
     @moves_history = []
+    @history_toggle = true
     @score = 0
   end
 end
@@ -107,9 +107,12 @@ class Human < Player
 
   def obtain_player_input
     player_input = ''
-    until %w[r rock p paper s scissors l lizard sp spock h history].include?(player_input)
+    until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
       prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
       player_input = gets.chomp.downcase
+      if player_input == 'h'
+        self.history_toggle = !self.history_toggle
+      end
     end
     player_input
   end
@@ -128,7 +131,7 @@ class Human < Player
 
   def choose
     self.move = Move.new(convert_player_input(obtain_player_input))
-    self.moves_history << move
+    self.moves_history << move.value
   end
 end
 
@@ -147,7 +150,7 @@ end
 
 # ---------------------------------------------------
 
-class RPSGame
+class RPSLSGame
   include UxUi
   attr_accessor :human, :computer, :current_winner, :game_count
 
@@ -247,4 +250,4 @@ class RPSGame
   end
 end
 
-RPSGame.new.play
+RPSLSGame.new.play
