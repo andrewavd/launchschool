@@ -1,6 +1,8 @@
 # oo_rpsls.rb
 # November 28, 2018
 
+VALUES = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock']
+
 module Prompt
   def prompt(message)
     print("=> #{message}")
@@ -10,28 +12,21 @@ end
 # ---------------------------------------------------
 
 class Move
-  VALUES = ['rock', 'paper', 'scissors']
+  attr_accessor :value
 
   def initialize(value)
     @value = value
   end
 
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
-  def scissors?
-    @value == 'scissors'
-  end
-
   def >(other_move)
-    rock? && other_move.scissors? ||
-      paper? && other_move.rock? ||
-      scissors? && other_move.paper?
+    win_matrix = {
+      rock: ['scissors', 'lizard'],
+      paper: ['rock', 'spock'],
+      scissors: ['paper', 'lizard'],
+      lizard: ['paper', 'spock'],
+      spock: ['scissors', 'rock']
+    }
+    win_matrix[@value.downcase.to_sym].include?(other_move.value.downcase.to_s)
   end
 
   def to_s
@@ -67,21 +62,23 @@ class Human < Player
 
   def obtain_player_input
     player_input = ''
-    until %w[r rock p paper s scissors].include?(player_input)
-      prompt("Please choose: (R)ock, (P)aper, (S)cissors? ")
-      player_input = gets().chomp().downcase
+    until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
+      prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
+      player_input = gets.chomp.downcase
     end
     player_input
   end
 
   def convert_player_input(player_input)
-    if player_input.start_with?('r')
-      'rock'
-    elsif player_input.start_with?('p')
-      'paper'
-    else
-      'scissors'
-    end
+    player_input = 'k' if player_input == 'sp' || player_input == 'spock'
+    throws = {
+      r: 'Rock',
+      p: 'Paper',
+      s: 'Scissors',
+      l: 'Lizzard',
+      k: 'Spock'
+    }
+    throws[player_input[0].to_sym]
   end
 
   def choose
@@ -97,7 +94,7 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    self.move = Move.new(VALUES.sample)
   end
 end
 
