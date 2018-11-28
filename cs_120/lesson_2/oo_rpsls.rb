@@ -72,10 +72,12 @@ end
 # ---------------------------------------------------
 
 class Player
-  attr_accessor :name, :move, :score
+  attr_accessor :name, :move, :score, :moves_history
 
   def initialize
     set_name
+    # @moves_count = {Rock: 0, Paper: 0, Scissors: 0, Lizard: 0, Spock: 0}
+    @moves_history = []
     @score = 0
   end
 end
@@ -89,6 +91,7 @@ class Human < Player
     player_name = ''
     esc_count = 0
     loop do
+      display_game_banner
       prompt("Please enter your name: ")
       esc_count += 1
       player_name = gets.chomp.strip
@@ -104,7 +107,7 @@ class Human < Player
 
   def obtain_player_input
     player_input = ''
-    until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
+    until %w[r rock p paper s scissors l lizard sp spock h history].include?(player_input)
       prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
       player_input = gets.chomp.downcase
     end
@@ -125,6 +128,7 @@ class Human < Player
 
   def choose
     self.move = Move.new(convert_player_input(obtain_player_input))
+    self.moves_history << move
   end
 end
 
@@ -137,6 +141,7 @@ class Computer < Player
 
   def choose
     self.move = Move.new(VALUES.sample)
+    self.moves_history << move.value
   end
 end
 
@@ -146,17 +151,14 @@ class RPSGame
   include UxUi
   attr_accessor :human, :computer, :current_winner, :game_count
 
-  WIN_GAME = 3
+  WIN_GAME = 5
 
   def initialize
-    display_game_banner
     @human = Human.new
     @computer = Computer.new
     display_player_greeting
     @current_winner = ''
     @game_count = 0
-    @moves_count = {Rock: 0, Paper: 0, Scissors: 0, Lizard: 0, Spock: 0}
-    @moves_history = []
   end
 
   def play_hand
@@ -172,13 +174,11 @@ class RPSGame
   end
 
   def display_score
-    clear_screen
     display_game_banner
     puts "--- Score Board ---".center(TITLE.size)
     puts "#{human.name} #{human.score} | #{computer.name} #{computer.score}".center(TITLE.size)
     puts "(First to #{WIN_GAME}, wins match)".center(TITLE.size)
     hr_ln
-    # puts
   end
 
   def display_hand_winner
@@ -200,27 +200,19 @@ class RPSGame
     hr_ln
   end
 
-  def won_match?
-    human.score == WIN_GAME || computer.score == WIN_GAME
-  end
-
   def display_game_winner
     puts "\n  #{current_winner} won the game."
+  end
+  
+  def end_game?
+    prompt("Would you like a rematch? (Y)es to continue, or any other key to exit. ")
+    STDIN.getch.downcase != 'y'
   end
 
   def reset_score
     human.score = 0
     computer.score = 0
     self.game_count = 0
-  end
-
-  def end_game?
-    prompt("Would you like a rematch, (y)es or (n)o? ")
-    answer = gets.chomp.downcase
-    until %w[y yes n no].include?(answer)
-      puts "??? - Please enter (y)es or (n)o."
-    end
-    answer == 'n' || answer == 'no'
   end
 
   def rpsls_throw
@@ -233,14 +225,18 @@ class RPSGame
     display_score
     display_moves
   end
+  
+  def match_won?
+    human.score == WIN_GAME || computer.score == WIN_GAME
+  end
 
   def play
     loop do
       loop do
-        @game_count += 1
+        self.game_count += 1
         rpsls_throw
         display_throw_results
-        break if won_match?
+        break if match_won?
       end
       display_game_winner
       break if end_game?
