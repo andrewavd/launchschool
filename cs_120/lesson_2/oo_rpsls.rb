@@ -230,7 +230,7 @@ class RPSLSGame
     if human.history_toggle
       (0..human.moves_history.size - 1).each do |index|
         print human.moves_history[index]
-        puts computer.moves_history[index]
+        puts "#{computer.moves_history[index]}".rjustify(30)
       end
     end
   end
