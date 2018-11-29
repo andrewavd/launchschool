@@ -228,9 +228,12 @@ class RPSLSGame
     display_score
     display_moves
     if human.history_toggle
+      puts "History of moves".center(TITLE.size)
+      print "#{human.name}".center(14)
+      puts "#{computer.name}".center(20)
       (0..human.moves_history.size - 1).each do |index|
-        print human.moves_history[index]
-        puts "#{computer.moves_history[index]}".rjustify(30)
+        print "#{index + 1}. #{human.moves_history[index]}".ljust(20)
+        puts "#{index + 1}. #{computer.moves_history[index]}".ljust(15)
       end
     end
   end
