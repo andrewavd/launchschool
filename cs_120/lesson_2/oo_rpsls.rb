@@ -72,7 +72,7 @@ end
 # ---------------------------------------------------
 
 class Player
-  attr_accessor :name, :move, :score, :moves_history
+  attr_accessor :name, :move, :score, :moves_history, :history_toggle
 
   def initialize
     set_name
@@ -227,6 +227,12 @@ class RPSLSGame
   def display_throw_results
     display_score
     display_moves
+    if human.history_toggle
+      (0..human.moves_history.size - 1).each do |index|
+        print human.moves_history[index]
+        puts computer.moves_history[index]
+      end
+    end
   end
   
   def match_won?
