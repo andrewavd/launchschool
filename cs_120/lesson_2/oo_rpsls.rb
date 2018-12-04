@@ -3,9 +3,6 @@
 
 require 'io/console'
 
-VALUES = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock']
-TITLE = VALUES.join(' ')
-
 module UxUi
   def prompt(message)
     print("\n => #{message}")
@@ -16,31 +13,20 @@ module UxUi
   end
 
   def hr_ln
-    puts '-' * (TITLE.length + 2)
+    puts '-' * (RPSLSGame::DISPLAY_SIZE)
   end
 
   def display_game_banner
     clear_screen
     hr_ln
-    puts " #{TITLE}"
+    puts " #{RPSLSGame::TITLE}".center(RPSLSGame::DISPLAY_SIZE)
     hr_ln
   end
 
   def game_hold
     print "\nPress any key to continue..."
     STDIN.getch
-    print " \r\n"
-  end
-
-  def display_player_greeting
-    clear_screen
-    display_game_banner
-    puts "\nWelcome #{human.name}! Your opponent will be #{computer.name}."
-    game_hold
-  end
-
-  def display_goodbye_message
-    puts "\nGoodbye #{human.name}... Thank you for playing #{TITLE}!"
+    print " \n"
   end
 end
 
@@ -95,7 +81,7 @@ class Human < Player
       prompt("Please enter your name: ")
       esc_count += 1
       player_name = gets.chomp.strip
-      if esc_count == 3
+      if esc_count == 4
         puts "It appears you wish to be the 'Invisible Man', so be it!"
         player_name = "Invisible Man"
         sleep 2
@@ -110,8 +96,9 @@ class Human < Player
     until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
       prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
       player_input = gets.chomp.downcase
-      if player_input == 'h'
+      if player_input == 'h' || player_input == 'history'
         self.history_toggle = !self.history_toggle
+        puts "\n'History of Moves' has been turned #{self.history_toggle ? 'on' : 'off'}."
       end
     end
     player_input
@@ -143,7 +130,7 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(VALUES.sample)
+    self.move = Move.new(RPSLSGame::VALUES.sample)
     self.moves_history << move.value
   end
 end
@@ -154,13 +141,16 @@ class RPSLSGame
   include UxUi
   attr_accessor :human, :computer, :current_winner, :game_count
 
+  DISPLAY_SIZE = 50
+  VALUES = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock']
+  TITLE = VALUES.join(' ')
   WIN_GAME = 5
 
   def initialize
     @human = Human.new
     @computer = Computer.new
     display_player_greeting
-    @current_winner = ''
+    #@current_winner = ''
     @game_count = 0
   end
 
@@ -178,37 +168,39 @@ class RPSLSGame
 
   def display_score
     display_game_banner
-    puts "--- Score Board ---".center(TITLE.size)
-    puts "#{human.name} #{human.score} | #{computer.name} #{computer.score}".center(TITLE.size)
-    puts "(First to #{WIN_GAME}, wins match)".center(TITLE.size)
+    puts "--- Score Board ---".center(DISPLAY_SIZE)
+    puts "#{human.name} #{human.score} | #{computer.name} #{computer.score}".center(DISPLAY_SIZE)
+    puts "(First to #{WIN_GAME}, wins match)".center(DISPLAY_SIZE)
     hr_ln
   end
 
   def display_hand_winner
     if current_winner == 'draw'
-      puts "This hand's a draw!".center(TITLE.size)
+      puts "This hand's a draw!".center(DISPLAY_SIZE)
     else
-      puts "#{current_winner.upcase} WINS!".center(TITLE.size)
+      puts "#{current_winner.upcase} WINS!".center(DISPLAY_SIZE)
     end
   end
 
   def display_moves
-    puts "Game #{game_count}".center(TITLE.size)
+    puts "Game #{game_count}".center(DISPLAY_SIZE)
     puts
     display_hand_winner
     puts
-    puts "#{human.name}'s move: #{human.move}".center(TITLE.size)
-    puts "vs".center(TITLE.size)
-    puts "#{computer.name}'s move: #{computer.move}".gsub(/s's/, "s'").center(TITLE.size)
+    puts "#{human.name}'s move: #{human.move}".center(DISPLAY_SIZE)
+    puts "vs".center(DISPLAY_SIZE)
+    puts "#{computer.name}'s move: #{computer.move}"\
+      .gsub(/s's/, "s'").center(DISPLAY_SIZE)
     hr_ln
   end
 
   def display_game_winner
     puts "\n  #{current_winner} won the game."
   end
-  
+
   def end_game?
-    prompt("Would you like a rematch? (Y)es to continue, or any other key to exit. ")
+    prompt("Would you like a rematch? (Y)es to continue,"\
+           " or any other key to exit. ")
     STDIN.getch.downcase != 'y'
   end
 
@@ -224,22 +216,49 @@ class RPSLSGame
     play_hand
   end
 
+  def display_history_headings
+    puts "History of Moves".center(DISPLAY_SIZE)
+    print human.name.center(DISPLAY_SIZE / 2)
+    puts computer.name.center(DISPLAY_SIZE / 2)
+  end
+
+  def display_history
+    display_history_headings
+    (0..human.moves_history.size - 1).each do |index|
+      print "     #{index + 1}. #{human.moves_history[index]}".ljust(30)
+      puts "#{index + 1}. #{computer.moves_history[index]}".ljust(25)
+    end
+  end
+
   def display_throw_results
     display_score
     display_moves
-    if human.history_toggle
-      puts "History of moves".center(TITLE.size)
-      print "#{human.name}".center(14)
-      puts "#{computer.name}".center(20)
-      (0..human.moves_history.size - 1).each do |index|
-        print "#{index + 1}. #{human.moves_history[index]}".ljust(20)
-        puts "#{index + 1}. #{computer.moves_history[index]}".ljust(15)
-      end
-    end
+    display_history if human.history_toggle
   end
-  
+
   def match_won?
     human.score == WIN_GAME || computer.score == WIN_GAME
+  end
+
+  def display_player_greeting
+    clear_screen
+    display_game_banner
+    puts "\nWelcome #{human.name}! Your opponent will be #{computer.name}."
+    game_hold
+  end
+
+  def display_rematch_greeting
+    clear_screen
+    display_game_banner
+    print "\n#{computer.name}, are you ready for the rematch? "
+    sleep 1
+    puts "Yes"
+    puts "\n#{human.name}, When you are ready... "
+    game_hold
+  end
+
+  def display_goodbye_message
+    puts "\nGoodbye #{human.name}... Thank you for playing #{RPSLSGame::TITLE}!"
   end
 
   def play
@@ -254,9 +273,11 @@ class RPSLSGame
       break if end_game?
       reset_score
       display_game_banner
+      display_rematch_greeting
     end
     display_goodbye_message
   end
 end
 
-RPSLSGame.new.play
+friendly = RPSLSGame.new
+friendly.play
