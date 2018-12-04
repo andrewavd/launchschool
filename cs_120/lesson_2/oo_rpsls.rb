@@ -13,7 +13,7 @@ module UxUi
   end
 
   def hr_ln
-    puts '-' * (RPSLSGame::DISPLAY_SIZE)
+    puts '-' * RPSLSGame::DISPLAY_SIZE
   end
 
   def display_game_banner
@@ -41,13 +41,13 @@ class Move
 
   def >(other_move)
     win_matrix = {
-      rock: ['scissors', 'lizard'],
-      paper: ['rock', 'spock'],
-      scissors: ['paper', 'lizard'],
-      lizard: ['paper', 'spock'],
-      spock: ['scissors', 'rock']
+      Rock: ['Scissors', 'Lizard'],
+      Paper: ['Rock', 'Spock'],
+      Scissors: ['Paper', 'Lizard'],
+      Lizard: ['Paper', 'Spock'],
+      Spock: ['Scissors', 'Rock']
     }
-    win_matrix[value.downcase.to_sym].include?(other_move.value.downcase.to_s)
+    win_matrix[value.to_sym].include?(other_move.value.to_s)
   end
 
   def to_s
@@ -97,8 +97,9 @@ class Human < Player
       prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
       player_input = gets.chomp.downcase
       if player_input == 'h' || player_input == 'history'
-        self.history_toggle = !self.history_toggle
-        puts "\n'History of Moves' has been turned #{self.history_toggle ? 'on' : 'off'}."
+        self.history_toggle = !history_toggle
+        puts "\n'History of Moves' has been turned"\
+             " #{history_toggle ? 'on' : 'off'}."
       end
     end
     player_input
@@ -118,7 +119,7 @@ class Human < Player
 
   def choose
     self.move = Move.new(convert_player_input(obtain_player_input))
-    self.moves_history << move.value
+    moves_history << move.value
   end
 end
 
@@ -131,7 +132,7 @@ class Computer < Player
 
   def choose
     self.move = Move.new(RPSLSGame::VALUES.sample)
-    self.moves_history << move.value
+    moves_history << move.value
   end
 end
 
@@ -150,43 +151,53 @@ class RPSLSGame
     @human = Human.new
     @computer = Computer.new
     display_player_greeting
-    #@current_winner = ''
     @game_count = 0
   end
 
   def play_hand
-    if human.move > computer.move
-      self.current_winner = human.name
+    self.current_winner = if human.move > computer.move
+                            human.name
+                          elsif computer.move > human.move
+                            self.current_winner = computer.name
+                          else
+                            self.current_winner = ''
+                          end
+  end
+
+  def update_score(winner)
+    if winner == human.name
       human.score += 1
-    elsif computer.move > human.move
-      self.current_winner = computer.name
+    elsif winner == computer.name
       computer.score += 1
-    else
-      self.current_winner = 'draw'
     end
   end
 
   def display_score
     display_game_banner
     puts "--- Score Board ---".center(DISPLAY_SIZE)
-    puts "#{human.name} #{human.score} | #{computer.name} #{computer.score}".center(DISPLAY_SIZE)
+    puts "#{human.name} #{human.score} | #{computer.name}"\
+         " #{computer.score}".center(DISPLAY_SIZE)
     puts "(First to #{WIN_GAME}, wins match)".center(DISPLAY_SIZE)
     hr_ln
   end
 
+  def display_game_number
+    puts "Game #{game_count}".center(DISPLAY_SIZE)
+    puts
+  end
+
   def display_hand_winner
-    if current_winner == 'draw'
+    if current_winner == ''
       puts "This hand's a draw!".center(DISPLAY_SIZE)
     else
       puts "#{current_winner.upcase} WINS!".center(DISPLAY_SIZE)
     end
+    puts
   end
 
   def display_moves
-    puts "Game #{game_count}".center(DISPLAY_SIZE)
-    puts
+    display_game_number
     display_hand_winner
-    puts
     puts "#{human.name}'s move: #{human.move}".center(DISPLAY_SIZE)
     puts "vs".center(DISPLAY_SIZE)
     puts "#{computer.name}'s move: #{computer.move}"\
@@ -214,6 +225,7 @@ class RPSLSGame
     human.choose
     computer.choose
     play_hand
+    update_score(current_winner)
   end
 
   def display_history_headings
