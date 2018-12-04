@@ -126,13 +126,46 @@ end
 # ---------------------------------------------------
 
 class Computer < Player
+  attr_accessor :initial_greeting
+
+  def initialize
+    super
+    load_droid_profile
+  end
+
   def set_name
-    self.name = ['R2-D2', 'C-3PO', 'K-2SO', 'BB-8', 'L3-37'].sample
+    self.name = ['C-3PO', 'K-2SO','R2-D2', 'BB-8', 'L3-37'].sample
+  end
+
+  def load_droid_profile
+    case name
+    when 'C-3PO'
+      self.initial_greeting = "I'm C-3PO, human cyborg relations."
+    when 'K-2SO'
+      self.initial_greeting = "I'm K-2SO, I'm a reprogrammed imperial droid."
+    when 'L3-37'
+      self.initial_greeting = "I'm L3_37, I'm a self made droid!"
+    when 'R2-D2'
+      self.initial_greeting = "(translated...) I'm R2-D2, you can call me R2 for short."
+    when 'BB-8'
+      self.initial_greeting = "(translated...) I'm BB-8."
+    end
   end
 
   def choose
-    self.move = Move.new(RPSLSGame::VALUES.sample)
-    moves_history << move.value
+    case name
+    when 'C-3PO'
+      self.move = Move.new('Rock')
+    when 'K-2SO'
+      self.move = Move.new(RPSLSGame::VALUES.sample)
+    when 'L3-37'
+      self.move = Move.new(RPSLSGame::VALUES.sample)
+    when 'R2-D2'
+      self.move = Move.new(RPSLSGame::VALUES.sample)
+    when 'BB-8'
+      self.move = Move.new(RPSLSGame::VALUES.sample)
+    end
+  moves_history << move.value
   end
 end
 
@@ -196,12 +229,11 @@ class RPSLSGame
   end
 
   def display_moves
-    display_game_number
-    display_hand_winner
-    puts "#{human.name}'s move: #{human.move}".center(DISPLAY_SIZE)
+    puts "#{human.name}'s move: #{human.move}"
+      .sub(/s's/, "s'").center(DISPLAY_SIZE)
     puts "vs".center(DISPLAY_SIZE)
-    puts "#{computer.name}'s move: #{computer.move}"\
-      .gsub(/s's/, "s'").center(DISPLAY_SIZE)
+    puts "#{computer.name}'s move: #{computer.move}"
+      .sub(/s's/, "s'").center(DISPLAY_SIZE)
     hr_ln
   end
 
@@ -222,6 +254,7 @@ class RPSLSGame
   end
 
   def rpsls_throw
+    self.game_count += 1
     human.choose
     computer.choose
     play_hand
@@ -244,6 +277,8 @@ class RPSLSGame
 
   def display_throw_results
     display_score
+    display_game_number
+    display_hand_winner
     display_moves
     display_history if human.history_toggle
   end
@@ -256,6 +291,7 @@ class RPSLSGame
     clear_screen
     display_game_banner
     puts "\nWelcome #{human.name}! Your opponent will be #{computer.name}."
+    puts "\nHi #{human.name}, #{computer.initial_greeting}"
     game_hold
   end
 
@@ -276,7 +312,6 @@ class RPSLSGame
   def play
     loop do
       loop do
-        self.game_count += 1
         rpsls_throw
         display_throw_results
         break if match_won?
