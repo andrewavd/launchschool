@@ -134,7 +134,7 @@ class Computer < Player
   end
 
   def set_name
-    self.name = ['C-3PO', 'K-2SO','R2-D2', 'BB-8', 'L3-37'].sample
+    self.name = 'R2-D2'#['C-3PO', 'K-2SO','R2-D2', 'BB-8', 'L3-37'].sample
   end
 
   def load_droid_profile
@@ -152,6 +152,11 @@ class Computer < Player
     end
   end
 
+  def rotate_values
+    x = ((moves_history.size) % 5)
+    RPSLSGame::VALUES[x]
+  end
+
   def choose
     case name
     when 'C-3PO'
@@ -161,7 +166,7 @@ class Computer < Player
     when 'L3-37'
       self.move = Move.new(RPSLSGame::VALUES.sample)
     when 'R2-D2'
-      self.move = Move.new(RPSLSGame::VALUES.sample)
+      self.move = Move.new(rotate_values)
     when 'BB-8'
       self.move = Move.new(RPSLSGame::VALUES.sample)
     end
