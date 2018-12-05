@@ -1,6 +1,8 @@
 # oo_rpsls.rb
 # November 28, 2018
 
+require 'pry'
+
 require 'io/console'
 
 module UxUi
@@ -69,13 +71,21 @@ end
 # ---------------------------------------------------
 
 class Player
-  attr_accessor :name, :move, :score, :moves_history, :history_toggle
+  attr_accessor :name, :move, :score, :moves_history
 
   def initialize
     set_name
     @moves_history = []
-    @history_toggle = true
     @score = 0
+    @@history_toggle = true
+  end
+
+  def self.history_toggle
+    @@history_toggle
+  end
+
+  def self.toggle_history
+    @@history_toggle = !@@history_toggle
   end
 end
 
@@ -108,9 +118,9 @@ class Human < Player
       prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
       player_input = gets.chomp.downcase
       if player_input == 'h' || player_input == 'history'
-        self.history_toggle = !history_toggle
+        Player.toggle_history
         puts "\n'History of Moves' has been turned"\
-             " #{history_toggle ? 'on' : 'off'}."
+             " #{Player.history_toggle ? 'on' : 'off'}."
       end
     end
     player_input
@@ -138,17 +148,38 @@ end
 
 class Computer < Player
   attr_accessor :initial_greeting
-  attr_reader :stubborn_throw
+
+  OLD_SCHOOL = ['Rock', 'Paper', 'Scissors']
+  # Order of R_P_S_SP_L_ORDERED is relevant vs THROW_VALUES
+  R_P_S_SP_L_ORDERED = ['Rock', 'Paper', 'Scissors', 'Spock', 'Lizard']
+  STUBBORN_THROW = R_P_S_SP_L_ORDERED.sample
 
   def initialize
     super
     load_droid_profile
-    @stubborn_throw = RPSLSGame::VALUES.sample
   end
 
   def set_name
     self.name = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
   end
+
+  def choose
+    case name
+    when 'C-3PO'
+      self.move = Move.new(OLD_SCHOOL.sample)
+    when 'K-2SO'
+      self.move = Move.new(STUBBORN_THROW)
+    when 'L3-37'
+      self.move = Move.new(RPSLSGame::THROW_VALUES.sample)
+    when 'R2-D2'
+      self.move = Move.new(rotate_values)
+    when 'BB-8'
+      self.move = Move.new(rotate_defense)
+    end
+    moves_history << move.value
+  end
+
+private
 
   def load_droid_profile
     case name
@@ -157,52 +188,30 @@ class Computer < Player
     when 'K-2SO'
       self.initial_greeting = "\nGreetings, I'm K-2SO, a"\
                               " reprogrammed imperial droid."
+      stuck_on_it
     when 'L3-37'
       self.initial_greeting = "\nI'm L3_37. I'm a self made droid!"
     when 'R2-D2'
       self.initial_greeting = "\n(translated...) \"Nice to meet you, I'm "\
                               "R2-D2, you can call me R2 for short.\""
     when 'BB-8'
-      self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8.\""
+      self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8, just"\
+                              " rolling along!\""
     end
   end
 
   def rotate_values
-    x = moves_history.size % 5
-    RPSLSGame::VALUES[x]
+    index = moves_history.size % 5
+    RPSLSGame::THROW_VALUES[index]
   end
 
   def rotate_defense
-    y = (moves_history.size + 1) % 4
-    ['Rock', 'Paper', 'Scissors', 'Spock', 'Lizard'][y]
-  end
-
-  def old_school
-    ['Rock', 'Paper', 'Scissors'].sample
+    index = (moves_history.size + 1) % 4
+    R_P_S_SP_L_ORDERED[index]
   end
 
   def stuck_on_it
-    stubborn_throw
-  end
-
-  def random_choices
-    RPSLSGame::VALUES.sample
-  end
-
-  def choose
-    case name
-    when 'C-3PO'
-      self.move = Move.new(old_school)
-    when 'K-2SO'
-      self.move = Move.new(stuck_on_it)
-    when 'L3-37'
-      self.move = Move.new(random_choices)
-    when 'R2-D2'
-      self.move = Move.new(rotate_values)
-    when 'BB-8'
-      self.move = Move.new(rotate_defense)
-    end
-    moves_history << move.value
+    Player.toggle_history
   end
 end
 
@@ -213,8 +222,8 @@ class RPSLSGame
   attr_accessor :human, :computer, :current_winner, :game_count
 
   DISPLAY_SIZE = 50
-  VALUES = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock']
-  TITLE = VALUES.join(' ')
+  THROW_VALUES = ['Rock', 'Paper', 'Scissors', 'Lizard', 'Spock']
+  TITLE = THROW_VALUES.join(' ')
   WIN_GAME = 5
 
   def initialize
@@ -304,7 +313,7 @@ class RPSLSGame
     display_game_number
     display_hand_winner
     display_moves
-    display_history if human.history_toggle
+    display_history if Player.history_toggle
   end
 
   # -- end display methods --
