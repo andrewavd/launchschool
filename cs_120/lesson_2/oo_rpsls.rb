@@ -28,6 +28,15 @@ module UxUi
     STDIN.getch
     print " \n"
   end
+
+  def display_game_notes
+    puts "\n  Game Notes:"
+    puts "    - The history of each player's moves is displayed after each 'throw',"
+    puts "      \"h\" may be entered at the 'Please choose:' your move prompt to toggle"
+    puts "      the history on/off."
+    puts
+    game_hold
+  end
 end
 
 # ---------------------------------------------------
@@ -136,7 +145,7 @@ class Computer < Player
   end
 
   def set_name
-    self.name = 'BB-8'#['C-3PO', 'K-2SO','R2-D2', 'BB-8', 'L3-37'].sample
+    self.name = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
   end
 
   def load_droid_profile
@@ -144,12 +153,13 @@ class Computer < Player
     when 'C-3PO'
       self.initial_greeting = "\nHi, I'm C-3PO, human cyborg relations."
     when 'K-2SO'
-      self.initial_greeting = "\nGreetings, I'm K-2SO, a reprogrammed imperial droid."
+      self.initial_greeting = "\nGreetings, I'm K-2SO, a"\
+                              " reprogrammed imperial droid."
     when 'L3-37'
       self.initial_greeting = "\nI'm L3_37. I'm a self made droid!"
     when 'R2-D2'
-      self.initial_greeting = "\n(translated...) \"Nice to meet you, I'm R2-D2,"\
-                              " you can call me R2 for short.\""
+      self.initial_greeting = "\n(translated...) \"Nice to meet you, I'm "\
+                              "R2-D2, you can call me R2 for short.\""
     when 'BB-8'
       self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8.\""
     end
@@ -166,7 +176,7 @@ class Computer < Player
   end
 
   def old_school
-    original_throws = ['Rock', 'Paper', 'Scissors'].sample
+    ['Rock', 'Paper', 'Scissors'].sample
   end
 
   def stuck_on_it
@@ -212,24 +222,17 @@ class RPSLSGame
     @game_count = 0
   end
 
-  def play_hand
-    self.current_winner = if human.move > computer.move
-                            human.name
-                          elsif computer.move > human.move
-                            self.current_winner = computer.name
-                          else
-                            self.current_winner = ''
-                          end
-  end
+  # -- "display" methods --
 
-  def update_score(winner)
-    if winner == human.name
-      human.score += 1
-    elsif winner == computer.name
-      computer.score += 1
-    end
+  def display_player_greeting
+    clear_screen
+    display_game_banner
+    puts "\nWelcome #{human.name}! Your opponent will be #{computer.name}."
+    puts computer.initial_greeting
+    game_hold
+    display_game_notes
   end
-
+  
   def display_score
     display_game_banner
     puts "--- Score Board ---".center(DISPLAY_SIZE)
@@ -266,6 +269,62 @@ class RPSLSGame
     puts "\n  #{current_winner} won the game."
   end
 
+  def display_history_headings
+    puts "History of Moves".center(DISPLAY_SIZE)
+    print human.name.center(DISPLAY_SIZE / 2)
+    puts computer.name.center(DISPLAY_SIZE / 2)
+  end
+
+  def display_history
+    display_history_headings
+    (0..human.moves_history.size - 1).each do |index|
+      print "     #{index + 1}. #{human.moves_history[index]}".ljust(30)
+      puts "#{index + 1}. #{computer.moves_history[index]}".ljust(25)
+    end
+  end
+
+  def display_rematch_greeting
+    clear_screen
+    display_game_banner
+    print "\n#{computer.name}, are you ready for the rematch? "
+    sleep 1
+    puts "Yes"
+    puts "\n#{human.name}, When you are ready... "
+    game_hold
+  end
+
+  def display_goodbye_message
+    puts "\nGoodbye #{human.name}... Thank you for playing #{RPSLSGame::TITLE}!"
+  end
+
+  def display_throw_results
+    display_score
+    display_game_number
+    display_hand_winner
+    display_moves
+    display_history if human.history_toggle
+  end
+
+  # -- end display methods --
+
+  def play_hand
+    self.current_winner = if human.move > computer.move
+                            human.name
+                          elsif computer.move > human.move
+                            self.current_winner = computer.name
+                          else
+                            self.current_winner = ''
+                          end
+  end
+
+  def update_score(winner)
+    if winner == human.name
+      human.score += 1
+    elsif winner == computer.name
+      computer.score += 1
+    end
+  end
+
   def end_game?
     prompt("Would you like a rematch? (Y)es to continue,"\
            " or any other key to exit. ")
@@ -286,52 +345,8 @@ class RPSLSGame
     update_score(current_winner)
   end
 
-  def display_history_headings
-    puts "History of Moves".center(DISPLAY_SIZE)
-    print human.name.center(DISPLAY_SIZE / 2)
-    puts computer.name.center(DISPLAY_SIZE / 2)
-  end
-
-  def display_history
-    display_history_headings
-    (0..human.moves_history.size - 1).each do |index|
-      print "     #{index + 1}. #{human.moves_history[index]}".ljust(30)
-      puts "#{index + 1}. #{computer.moves_history[index]}".ljust(25)
-    end
-  end
-
-  def display_throw_results
-    display_score
-    display_game_number
-    display_hand_winner
-    display_moves
-    display_history if human.history_toggle
-  end
-
   def match_won?
     human.score == WIN_GAME || computer.score == WIN_GAME
-  end
-
-  def display_player_greeting
-    clear_screen
-    display_game_banner
-    puts "\nWelcome #{human.name}! Your opponent will be #{computer.name}."
-    puts "#{computer.initial_greeting}"
-    game_hold
-  end
-
-  def display_rematch_greeting
-    clear_screen
-    display_game_banner
-    print "\n#{computer.name}, are you ready for the rematch? "
-    sleep 1
-    puts "Yes"
-    puts "\n#{human.name}, When you are ready... "
-    game_hold
-  end
-
-  def display_goodbye_message
-    puts "\nGoodbye #{human.name}... Thank you for playing #{RPSLSGame::TITLE}!"
   end
 
   def play
