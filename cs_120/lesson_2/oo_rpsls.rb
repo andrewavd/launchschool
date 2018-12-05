@@ -127,50 +127,70 @@ end
 
 class Computer < Player
   attr_accessor :initial_greeting
+  attr_reader :stubborn_throw
 
   def initialize
     super
     load_droid_profile
+    @stubborn_throw = RPSLSGame::VALUES.sample
   end
 
   def set_name
-    self.name = 'R2-D2'#['C-3PO', 'K-2SO','R2-D2', 'BB-8', 'L3-37'].sample
+    self.name = 'BB-8'#['C-3PO', 'K-2SO','R2-D2', 'BB-8', 'L3-37'].sample
   end
 
   def load_droid_profile
     case name
     when 'C-3PO'
-      self.initial_greeting = "I'm C-3PO, human cyborg relations."
+      self.initial_greeting = "\nHi, I'm C-3PO, human cyborg relations."
     when 'K-2SO'
-      self.initial_greeting = "I'm K-2SO, I'm a reprogrammed imperial droid."
+      self.initial_greeting = "\nGreetings, I'm K-2SO, a reprogrammed imperial droid."
     when 'L3-37'
-      self.initial_greeting = "I'm L3_37, I'm a self made droid!"
+      self.initial_greeting = "\nI'm L3_37. I'm a self made droid!"
     when 'R2-D2'
-      self.initial_greeting = "(translated...) I'm R2-D2, you can call me R2 for short."
+      self.initial_greeting = "\n(translated...) \"Nice to meet you, I'm R2-D2,"\
+                              " you can call me R2 for short.\""
     when 'BB-8'
-      self.initial_greeting = "(translated...) I'm BB-8."
+      self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8.\""
     end
   end
 
   def rotate_values
-    x = ((moves_history.size) % 5)
+    x = moves_history.size % 5
     RPSLSGame::VALUES[x]
+  end
+
+  def rotate_defense
+    y = (moves_history.size + 1) % 4
+    ['Rock', 'Paper', 'Scissors', 'Spock', 'Lizard'][y]
+  end
+
+  def old_school
+    original_throws = ['Rock', 'Paper', 'Scissors'].sample
+  end
+
+  def stuck_on_it
+    stubborn_throw
+  end
+
+  def random_choices
+    RPSLSGame::VALUES.sample
   end
 
   def choose
     case name
     when 'C-3PO'
-      self.move = Move.new('Rock')
+      self.move = Move.new(old_school)
     when 'K-2SO'
-      self.move = Move.new(RPSLSGame::VALUES.sample)
+      self.move = Move.new(stuck_on_it)
     when 'L3-37'
-      self.move = Move.new(RPSLSGame::VALUES.sample)
+      self.move = Move.new(random_choices)
     when 'R2-D2'
       self.move = Move.new(rotate_values)
     when 'BB-8'
-      self.move = Move.new(RPSLSGame::VALUES.sample)
+      self.move = Move.new(rotate_defense)
     end
-  moves_history << move.value
+    moves_history << move.value
   end
 end
 
@@ -296,7 +316,7 @@ class RPSLSGame
     clear_screen
     display_game_banner
     puts "\nWelcome #{human.name}! Your opponent will be #{computer.name}."
-    puts "\nHi #{human.name}, #{computer.initial_greeting}"
+    puts "#{computer.initial_greeting}"
     game_hold
   end
 
