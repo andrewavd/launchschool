@@ -31,8 +31,10 @@ module UxUi
 
   def display_game_notes
     puts "\n  Game Notes:"
-    puts "    - The history of each player's moves is displayed after each 'throw',"
-    puts "      \"h\" may be entered at the 'Please choose:' your move prompt to toggle"
+    puts "    - The history of each player's moves is displayed after each"\
+         " 'throw',"
+    puts "      \"h\" may be entered at the 'Please choose:' your move prompt"\
+         " to toggle"
     puts "      the history on/off."
     puts
     game_hold
@@ -232,7 +234,7 @@ class RPSLSGame
     game_hold
     display_game_notes
   end
-  
+
   def display_score
     display_game_banner
     puts "--- Score Board ---".center(DISPLAY_SIZE)
@@ -307,14 +309,20 @@ class RPSLSGame
 
   # -- end display methods --
 
-  def play_hand
-    self.current_winner = if human.move > computer.move
-                            human.name
-                          elsif computer.move > human.move
-                            self.current_winner = computer.name
-                          else
-                            self.current_winner = ''
-                          end
+  def reset_score
+    human.score = 0
+    computer.score = 0
+    self.game_count = 0
+  end
+
+  def end_game?
+    prompt("Would you like a rematch? (Y)es to continue,"\
+           " or any other key to exit. ")
+    STDIN.getch.downcase != 'y'
+  end
+
+  def match_won?
+    human.score == WIN_GAME || computer.score == WIN_GAME
   end
 
   def update_score(winner)
@@ -325,16 +333,14 @@ class RPSLSGame
     end
   end
 
-  def end_game?
-    prompt("Would you like a rematch? (Y)es to continue,"\
-           " or any other key to exit. ")
-    STDIN.getch.downcase != 'y'
-  end
-
-  def reset_score
-    human.score = 0
-    computer.score = 0
-    self.game_count = 0
+  def play_hand
+    self.current_winner = if human.move > computer.move
+                            human.name
+                          elsif computer.move > human.move
+                            self.current_winner = computer.name
+                          else
+                            self.current_winner = ''
+                          end
   end
 
   def rpsls_throw
@@ -343,10 +349,6 @@ class RPSLSGame
     computer.choose
     play_hand
     update_score(current_winner)
-  end
-
-  def match_won?
-    human.score == WIN_GAME || computer.score == WIN_GAME
   end
 
   def play
