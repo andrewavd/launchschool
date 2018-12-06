@@ -1,8 +1,6 @@
 # oo_rpsls.rb
 # November 28, 2018
 
-require 'pry'
-
 require 'io/console'
 
 module UxUi
@@ -163,7 +161,8 @@ class Computer < Player
   end
 
   def set_name
-    self.name = 'K-2SO' # ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
+    self.name = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
+    # self.name = 'K-2SO'
   end
 
   def choose
@@ -183,6 +182,8 @@ class Computer < Player
   end
 
   private
+
+  # -- droid profiles --
 
   def c3po
     self.initial_greeting = "\nHi, I'm C-3PO, human cyborg relations."
@@ -207,6 +208,8 @@ class Computer < Player
     self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8, just"\
                               " rolling along!\""
   end
+
+  # -- end droid profiles --
 
   def load_droid_profile
     case name
