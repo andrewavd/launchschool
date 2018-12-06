@@ -73,19 +73,20 @@ end
 class Player
   attr_accessor :name, :move, :score, :moves_history
 
+  @@history_toggle = true
+
   def initialize
     set_name
     @moves_history = []
     @score = 0
-    @@history_toggle = true
   end
 
   def self.history_toggle
     @@history_toggle
   end
 
-  def self.toggle_history
-    @@history_toggle = !@@history_toggle
+  def history_toggle
+    @@history_toggle
   end
 end
 
@@ -112,15 +113,22 @@ class Human < Player
     self.name = player_name
   end
 
+  def choose
+    self.move = Move.new(convert_player_input(obtain_player_input))
+    moves_history << move.value
+  end
+
+  private
+
   def obtain_player_input
     player_input = ''
     until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
       prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
       player_input = gets.chomp.downcase
       if player_input == 'h' || player_input == 'history'
-        Player.toggle_history
+        @@history_toggle = !@@history_toggle
         puts "\n'History of Moves' has been turned"\
-             " #{Player.history_toggle ? 'on' : 'off'}."
+             " #{@@history_toggle ? 'on' : 'off'}."
       end
     end
     player_input
@@ -136,11 +144,6 @@ class Human < Player
       k: 'Spock'
     }
     throws[player_input[0].to_sym]
-  end
-
-  def choose
-    self.move = Move.new(convert_player_input(obtain_player_input))
-    moves_history << move.value
   end
 end
 
@@ -160,7 +163,7 @@ class Computer < Player
   end
 
   def set_name
-    self.name = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
+    self.name = 'K-2SO' # ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
   end
 
   def choose
@@ -179,24 +182,44 @@ class Computer < Player
     moves_history << move.value
   end
 
-private
+  private
+
+  def c3po
+    self.initial_greeting = "\nHi, I'm C-3PO, human cyborg relations."
+  end
+
+  def k2so
+    self.initial_greeting = "\nHello, I'm K-2SO, a reprogrammed"\
+    " imperial droid."
+    stuck_on_it
+  end
+
+  def l337
+    self.initial_greeting = "\nI'm L3_37. I'm a self made droid!"
+  end
+
+  def r2d2
+    self.initial_greeting = "\n(translated...) \"Nice to meet you, I'm "\
+                              "R2-D2, you can call me R2 for short.\""
+  end
+
+  def bb8
+    self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8, just"\
+                              " rolling along!\""
+  end
 
   def load_droid_profile
     case name
     when 'C-3PO'
-      self.initial_greeting = "\nHi, I'm C-3PO, human cyborg relations."
+      c3po
     when 'K-2SO'
-      self.initial_greeting = "\nGreetings, I'm K-2SO, a"\
-                              " reprogrammed imperial droid."
-      stuck_on_it
+      k2so
     when 'L3-37'
-      self.initial_greeting = "\nI'm L3_37. I'm a self made droid!"
+      l337
     when 'R2-D2'
-      self.initial_greeting = "\n(translated...) \"Nice to meet you, I'm "\
-                              "R2-D2, you can call me R2 for short.\""
+      r2d2
     when 'BB-8'
-      self.initial_greeting = "\n(translated...) \"Hey, I'm BB-8, just"\
-                              " rolling along!\""
+      bb8
     end
   end
 
@@ -211,7 +234,7 @@ private
   end
 
   def stuck_on_it
-    Player.toggle_history
+    @@history_toggle = !@@history_toggle
   end
 end
 
@@ -232,6 +255,24 @@ class RPSLSGame
     display_player_greeting
     @game_count = 0
   end
+
+  def play
+    loop do
+      loop do
+        rpsls_throw
+        display_throw_results
+        break if match_won?
+      end
+      display_game_winner
+      break if end_game?
+      reset_score
+      display_game_banner
+      display_rematch_greeting
+    end
+    display_goodbye_message
+  end
+
+  private
 
   # -- "display" methods --
 
@@ -358,22 +399,6 @@ class RPSLSGame
     computer.choose
     play_hand
     update_score(current_winner)
-  end
-
-  def play
-    loop do
-      loop do
-        rpsls_throw
-        display_throw_results
-        break if match_won?
-      end
-      display_game_winner
-      break if end_game?
-      reset_score
-      display_game_banner
-      display_rematch_greeting
-    end
-    display_goodbye_message
   end
 end
 
