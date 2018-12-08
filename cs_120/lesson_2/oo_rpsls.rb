@@ -99,8 +99,8 @@ class Human < Player
     loop do
       display_game_banner
       prompt("Please enter your name: ")
-      esc_count += 1
       player_name = gets.chomp.strip
+      esc_count += 1
       if esc_count == 4
         puts "It appears you wish to be the 'Invisible Man', so be it!"
         player_name = "Invisible Man"
@@ -119,14 +119,29 @@ class Human < Player
   private
 
   def obtain_player_input
-    player_input = ''
+    prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
+    player_input = gets.chomp.downcase
+    esc_count = 1
     until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
-      prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
-      player_input = gets.chomp.downcase
       if player_input == 'h' || player_input == 'history'
         @@history_toggle = !@@history_toggle
         puts "\n'History of Moves' has been turned"\
-             " #{@@history_toggle ? 'on' : 'off'}."
+              " #{@@history_toggle ? 'on' : 'off'}."
+        prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
+        player_input = gets.chomp.downcase
+      else
+        puts "I'm sorry, \"#{player_input}\" is an invlaid choice. Let's try again..."
+        prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
+        player_input = gets.chomp.downcase
+        esc_count += 1
+        if esc_count == 4
+          puts "    It appears you're struggling with choosing a throw..."
+          puts "    I'll make a choice for you."
+          player_input = RPSLSGame::THROW_VALUES.sample.downcase
+          puts
+          puts "    Your throw will be: #{player_input}"
+          sleep 2
+        end
       end
     end
     player_input
