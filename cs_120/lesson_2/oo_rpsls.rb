@@ -71,20 +71,10 @@ end
 class Player
   attr_accessor :name, :move, :score, :moves_history
 
-  @@history_toggle = true
-
   def initialize
     set_name
     @moves_history = []
     @score = 0
-  end
-
-  def self.history_toggle
-    @@history_toggle
-  end
-
-  def history_toggle
-    @@history_toggle
   end
 end
 
@@ -124,9 +114,9 @@ class Human < Player
     esc_count = 1
     until %w[r rock p paper s scissors l lizard sp spock].include?(player_input)
       if player_input == 'h' || player_input == 'history'
-        @@history_toggle = !@@history_toggle
+        RPSLSGame.toggle_history_visible
         puts "\n'History of Moves' has been turned"\
-              " #{@@history_toggle ? 'on' : 'off'}."
+              " #{RPSLSGame.history_visible? ? 'on' : 'off'}."
         prompt("Please choose: (R)ock, (P)aper, (S)cissors, (L)izard, (Sp)ock? ")
         player_input = gets.chomp.downcase
       else
@@ -177,7 +167,6 @@ class Computer < Player
 
   def set_name
     self.name = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
-    # self.name = 'K-2SO'
   end
 
   def choose
@@ -252,7 +241,7 @@ class Computer < Player
   end
 
   def stuck_on_it
-    @@history_toggle = !@@history_toggle
+    RPSLSGame.toggle_history_visible
   end
 end
 
@@ -267,11 +256,21 @@ class RPSLSGame
   TITLE = THROW_VALUES.join(' ')
   WIN_GAME = 5
 
+  @history_visible = true
+
   def initialize
     @human = Human.new
     @computer = Computer.new
     display_player_greeting
     @game_count = 0
+  end
+
+  def self.history_visible?
+    @history_visible
+  end
+
+  def self.toggle_history_visible
+    @history_visible = !@history_visible
   end
 
   def play
@@ -372,7 +371,7 @@ class RPSLSGame
     display_game_number
     display_hand_winner
     display_moves
-    display_history if Player.history_toggle
+    display_history if RPSLSGame.history_visible?
   end
 
   # -- end display methods --
