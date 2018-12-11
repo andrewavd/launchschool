@@ -319,7 +319,7 @@ class RPSLSGame
   private
 
   def set_droid
-    @droid = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample.new
+    @droid = [C3po, K2so, R2d2, Bb8, L337].sample.new
   end
 
   # -- "display" methods --
