@@ -319,19 +319,7 @@ class RPSLSGame
   private
 
   def set_droid
-    name = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample
-    case name
-    when 'C-3PO'
-      @droid = C3po.new
-    when 'K-2SO'
-      @droid = K2so.new
-    when 'L3-37'
-      @droid = L337.new
-    when 'R2-D2'
-      @droid = R2d2.new
-    when 'BB-8'
-      @droid = Bb8.new
-    end
+    @droid = ['C-3PO', 'K-2SO', 'R2-D2', 'BB-8', 'L3-37'].sample.new
   end
 
   # -- "display" methods --
