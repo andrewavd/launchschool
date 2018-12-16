@@ -7,4 +7,5 @@ end
 
 person1 = Person.new
 person1.name = 'Maris'
+# person1.name=('Maris')
 puts person1.name
