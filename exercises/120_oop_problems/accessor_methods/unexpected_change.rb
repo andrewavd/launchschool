@@ -1,0 +1,18 @@
+# unexpected_change.rb
+# December 16, 2018
+
+class Person
+  def name
+    "#{@first_name} #{@last_name}"
+  end
+
+  def name=(name)
+    # @first_name = name.split[0]
+    # @last_name = name.split[1]
+    @first_name, @last_name = name.split(' ')
+  end
+end
+
+person1 = Person.new
+person1.name = 'John Doe'
+puts person1.name
